@@ -96,20 +96,7 @@ jobs:
           emulator-boot-timeout: 900
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          script: |
-            set -e
-            adb install -r dist/android/KRENI-Android-v0.0.3-installable-test.apk
-            mkdir -p dist/screenshots/android
-            for item in home:0 map:1 departures:2 more:3; do
-              name="${item%%:*}"
-              index="${item##*:}"
-              adb shell am force-stop hr.brendigo.kreni || true
-              adb shell am start -W -n hr.brendigo.kreni/.MainActivity --ei kreni_capture_tab "$index"
-              sleep 5
-              adb shell pidof hr.brendigo.kreni
-              adb exec-out screencap -p > "dist/screenshots/android/$name.png"
-              test -s "dist/screenshots/android/$name.png"
-            done
+          script: bash tool/smoke_android.sh
       - uses: actions/upload-artifact@v4
         with:
           name: kreni-android-packages-0.0.3
