@@ -1,26 +1,16 @@
-# KRENI v0.0.2 — Android i iOS
+# KRENI v0.0.3 — Android APK / AAB i iOS
 
-Jednostavan pregled javnog prijevoza Hrvatske u dvije zasebne aplikacije.
+KRENI povezuje stanice, kolodvore i jadranske luke u preglednom sučelju.
 
-## Android
-- Kotlin i Jetpack Compose
-- KRENI vizualni identitet, početni ekran, karta, polasci, favoriti i postavke
-- Privatna JSON pohrana; bez registracije
+### Poboljšano
+- Instalacijski APK za Android, potpisan testnim certifikatom i provjeren na emulatoru.
+- Odvojeni Android App Bundle (AAB) uz mogućnost sigurnog produkcijskog potpisivanja.
+- iOS aplikacijska ikona i početni zaslon u stilu KRENI brenda.
+- iOS simulator aplikacija, uređajska arhiva (xcarchive), nepotpisani IPA i izvorni projekt.
+- Stvarne Android/iOS snimke iz automatiziranih pokretanja, umjesto dizajnerskih prikaza.
+- Novi GitHub workflow za provjere paketa prije objave.
 
-## iOS
-- Swift i SwiftUI
-- Apple Maps, početni ekran, karta, polasci, favoriti i postavke
-- Privatna JSON pohrana; bez registracije
+### Važne informacije
+Android paket *installable-test.apk* predviđen je za isprobavanje, a ne za Google Play. AAB koji nije produkcijski potpisan potrebno je potpisati trajnim ključem. iOS nepotpisani IPA nije moguće instalirati na obični iPhone bez valjanih Apple certifikata.
 
-## Podatkovni sustav
-- Jedinstven verzionirani katalog gradova i stajališta
-- GTFS ZIP validacija kalendara, vremenskih zona, identifikatora i presjedanja iz stvarnih podataka
-- Jasan izvor i status informacija; bez lažnih procjena dolaska
-
-## Distribucija
-
-Četiri datoteke: Android APK i arhiva projekta te iOS aplikacijska arhiva i arhiva projekta.
-
-**Potpisivanje:** ako GitHub nema konfigurirane potpisne certifikate, isporučeni artefakti ostaju nepotpisani. Android APK nije predviđen za neposrednu instalaciju, a iOS arhiva nije potpisani IPA. Ne objavljuju se kao spremni paketi za Play Store/App Store.
-
-Za promet u stvarnom vremenu, rute i obavijesti potrebni su potvrđeni izvori. Izdanje je početna baza za daljnje proširenje.
+Prikazane lokacije su orijentacijske. Službeni polasci i GPS podaci nisu aktivni. KRENI ne koristi vlastitu bazu podataka.

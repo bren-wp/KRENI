@@ -1,82 +1,74 @@
 <div align="center">
-
-<img src="assets/brand/logo.svg" alt="KRENI — Javni prijevoz Hrvatske" width="480"/>
+<img src="assets/brand/logo.svg" alt="KRENI — Javni prijevoz Hrvatske" width="520"/>
 
 # Cijela Hrvatska. Jedno putovanje.
 
-**Autobusi · Tramvaji · Vlakovi · Trajekti · Katamarani**
+### Autobusi · Tramvaji · Vlakovi · Trajekti · Katamarani
+
+**Jednostavnije putovanje od gradskih stanica do jadranskih luka.**
 
 [![Android](https://img.shields.io/badge/Android-Kotlin%20%2B%20Compose-146BFC?logo=android&logoColor=white)](android/)
 [![iOS](https://img.shields.io/badge/iOS-Swift%20%2B%20SwiftUI-071936?logo=apple&logoColor=white)](ios/)
-[![CI](https://github.com/bren-wp/KRENI/actions/workflows/platform-release.yml/badge.svg)](https://github.com/bren-wp/KRENI/actions/workflows/platform-release.yml)
-[![License](https://img.shields.io/badge/license-MIT-02CDBD)](LICENSE)
-[![No database](https://img.shields.io/badge/database-none-success)](docs/PRIVACY.md)
+[![Build](https://github.com/bren-wp/KRENI/actions/workflows/platform-release.yml/badge.svg)](https://github.com/bren-wp/KRENI/actions/workflows/platform-release.yml)
+[![MIT](https://img.shields.io/badge/license-MIT-02CDBD)](LICENSE)
 
-**[Preuzimanja](https://github.com/bren-wp/KRENI/releases)** · **[Android](android/)** · **[iOS](ios/)** · **[Izvori podataka](docs/DATA_SOURCES.md)** · **[Privatnost](docs/PRIVACY.md)**
-
+[**Preuzmi KRENI**](https://github.com/bren-wp/KRENI/releases) · [Android](android/) · [iOS](ios/) · [Prometni podaci](docs/DATA_SOURCES.md) · [Privatnost](docs/PRIVACY.md)
 </div>
 
-![KRENI — javni prijevoz Hrvatske](docs/media/hero.svg)
+![KRENI — Javni prijevoz Hrvatske](docs/media/hero.svg)
 
-## Jedna aplikacija za hrvatske gradove i otoke
+## Grad. Kolodvor. Luka. KRENI.
 
-KRENI objedinjuje pregled stanica, kolodvora i luka na jednostavnoj karti. Upoznajte gradski prijevoz, tramvajske mreže Zagreba i Osijeka, vlakove te pomorske linije Jadrana.
+Svako putovanje počinje informacijom. KRENI okuplja lokacije stanica, željezničkih kolodvora i luka u prepoznatljivom, jednostavnom sučelju. Pronađi ono što ti treba, spremi omiljene lokacije i istraži prometne terminale svog grada.
 
-### Osmišljeno za jednostavno putovanje
+Projekt je osmišljen za autobuse, tramvaje Zagreba i Osijeka, vlakove, trajekte i katamarane. Trenutačni prikazi sadrže orijentacijski katalog lokacija. **Službeni vozni redovi, GPS pozicije i multimodalne rute još nisu aktivne funkcije**; prikazivat će se samo iz dopuštenih, provjerenih izvora.
 
-- 🚌 **Autobusi** — lokacije stanica i pristupačan pregled odabranog grada.
-- 🚋 **Tramvaji** — gradske mreže Zagreba i Osijeka.
-- 🚆 **Vlakovi** — željeznički kolodvori i veze.
-- ⛴️ **Trajekti** — luke i pomorski terminali.
-- 🚤 **Katamarani** — luka po luka, od obale do otoka.
-- ⭐ **Omiljene lokacije** — pohranjene na uređaju.
-- 🗺️ **Karta** — MapLibre na Androidu, Apple Maps na iOS-u.
-- 🌗 **Teme** — ugodno čitanje danju i noću.
-- 🔒 **Privatnost** — nema registracije, vlastite baze podataka ni korisničkog praćenja.
+## Za putovanje bez komplikacija
 
-### Prikaz izgleda
+| 🚏 Stanice i terminali | 🗺️ Karte | ⭐ Omiljeno |
+| :--- | :--- | :--- |
+| Pretraži lokacije odabranog grada | Filtriraj vrstu prijevoza | Jednim dodirom spremi važna mjesta |
+| 🚉 Više načina prijevoza | 🌙 Dvije teme | 🔐 Privatnost |
+| Autobusi, tramvaji, vlakovi i brodovi | Svijetli i tamni izgled | Bez računa i vlastite baze podataka |
 
-<div align="center">
-<img src="docs/media/home.svg" alt="Početna stranica — dizajnerska ilustracija" width="225"/>
-<img src="docs/media/map.svg" alt="Karta — dizajnerska ilustracija" width="225"/>
-<img src="docs/media/settings.svg" alt="Postavke — dizajnerska ilustracija" width="225"/>
-</div>
+<!-- KRENI_REAL_SCREENSHOTS -->
 
-*Ilustracije prikazuju vizualni smjer; nisu potvrđene snimke aplikacija ni stvarni redovi vožnje.*
+## Preuzmi aplikaciju
 
-## Preuzimanja
+[**Sva izdanja — Android i iOS**](https://github.com/bren-wp/KRENI/releases)
 
-[**Releases — Android / iOS**](https://github.com/bren-wp/KRENI/releases)
+**Android:** testno potpisani APK označen *installable-test* može se isprobati na Android uređaju. Ako je konfiguriran trajni ključ izdanja, isporučuju se potpisani distribucijski APK i AAB. Bez toga je AAB namijenjen završnom potpisivanju prije Google Playa.
 
-Izdanje `v0.0.2` uključuje zasebne Android i iOS projektne izvore. Distribucijski APK i iOS paket isporučuju se u obliku koji odgovara dostupnim potpisnim certifikatima. **Nepotpisani Android APK i iOS ZIP nisu paketi za neposrednu objavu u trgovinama.** Za instalacijske distribucije potrebni su valjani Android signing ključ i Apple certifikati/provisioning profili. Više u [uputama za izradu](docs/BUILD.md).
+**iOS:** dostupni su Xcode projekt, simulator paket, uređajska arhiva i nepotpisani IPA. **Nepotpisani IPA ne može se instalirati na obični iPhone**; za stvarnu distribuciju potreban je Apple certifikat i provisioning profil.
 
-## Provjereni podatkovni izvori
+[**Upute za izradu, instalaciju i potpisivanje**](docs/BUILD.md)
 
-KRENI ne smije prikazivati izmišljene linije, vremena ili GPS procjene. Prikazane stanice su orijentacijske; službeni redovi vožnje dostupni su kroz integracije tek nakon potvrde prava korištenja i provjere valjanosti podataka.
+## Dvije platforme, isti KRENI
 
-- ZET: objavljena otvorena dozvola za GTFS/GTFS-Realtime
-- HŽPP: javni GTFS vozni red
-- TP Line: javno dostupan GTFS i JSON
-- Autotrolej: pronađen GTFS, trenutna dostupnost zahtijeva ponovnu provjeru
-- Promet Split, GPP, Jadrolinija, Krilo: javni vozni redovi; status programskog pristupa naveden u [matrici izvora](docs/DATA_SOURCES.md)
+| | Android | iOS |
+| :--- | :--- | :--- |
+| Sučelje | Kotlin / Jetpack Compose | Swift / SwiftUI |
+| Karta | MapLibre | Apple MapKit |
+| Favoriti | Privatna JSON datoteka | Privatna JSON datoteka |
+| Gradovi i stanice | [Katalog](data/catalog.json) | [Katalog](data/catalog.json) |
+| Automatizirane provjere | Gradle, testovi, instalacija u emulator | Xcode, pokretanje u simulatoru |
 
-KRENI nije službena aplikacija navedenih prijevoznika niti tvrdi da su sve integracije već aktivirane.
+Brendiranje, sadržaj kartica i navigacija razvijaju se usporedno, uz prilagodbu standardima Androida i iOS-a.
 
-## Android i iOS projekti
+## Pouzdani podaci, bez nagađanja
 
-| Platforma | Izvorni projekt | Sučelje | Pohrana |
-| --- | --- | --- | --- |
-| Android | [`android/`](android/) | Kotlin, Jetpack Compose | privatna JSON datoteka |
-| iOS | [`ios/`](ios/) | Swift, SwiftUI, MapKit | privatna JSON datoteka |
+[GTFS procesor](pipeline/gtfs.py) provjerava identifikatore, prometne kalendare, vremenske zone i presjedanja. Integracije se ne uključuju bez pouzdanog izvora i dopuštenja za korištenje.
 
-Obje aplikacije koriste istu verzioniranu [datoteku kataloga](data/catalog.json) i jednak naziv/broj izdanja. Nema SQL-a, Firebasea ili Supabasea.
+[**Izvori i licence**](docs/DATA_SOURCES.md) · [**Plan razvoja**](https://github.com/bren-wp/KRENI/issues/1)
 
-## Pouzdanost voznog reda
+## Privatnost i jednostavnost
 
-U repozitoriju je dostupan [GTFS procesor](pipeline/gtfs.py) koji validira dozvoljene ZIP datoteke, provjerava kalendare, linije, stanice, vremenske zone i dopuštena presjedanja iz potvrđenih grafova. Ne uvozi podatke koji nisu pravno i tehnički provjereni.
-
-Automatizirana provjera pokriva katalog, GTFS procesor te Android/iOS gradnju. Razvojna povezanost ne zamjenjuje testove na fizičkim uređajima.
+Favoriti, odabrani grad i tema ostaju na uređaju. Nema obvezne prijave, vlastite baze podataka, Firebasea, Supabasea ili praćenja korisnika. Karta koristi vanjsku kartografsku uslugu objašnjenu u [pravilima privatnosti](docs/PRIVACY.md).
 
 ---
 
-**KRENI © 2026 Brendigo** · [MIT](LICENSE) · [Politika privatnosti](docs/PRIVACY.md)
+<div align="center">
+<strong>KRENI · Brendigo © 2026</strong>
+
+[GitHub izdanja](https://github.com/bren-wp/KRENI/releases) · [Licenca](LICENSE) · [Dokumentacija](docs/BUILD.md)
+</div>

@@ -1,20 +1,21 @@
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.packages
-.pub-cache/
-.pub/
-build/
-coverage/
-*.iml
+# IDE / build products
 .idea/
 .vscode/
-# Native platforms generated in GitHub Actions; no secrets in git.
-android/
-ios/
+*.iml
+.DS_Store
+**/build/
+**/.gradle/
+*.xcworkspace/xcuserdata/
+ios/KRENI.xcodeproj/
+ios/KRENI/Assets.xcassets/AppIcon.appiconset/AppIcon.png
+# Credentials and signing materials
 .env
 .env.*
+!.env.example
 *.jks
 *.keystore
 *.p12
 *.mobileprovision
+*.p8
+# Bundles
+dist/

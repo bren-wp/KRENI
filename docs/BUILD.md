@@ -1,45 +1,50 @@
-# Izrada Android i iOS paketa
-
-Obje aplikacije imaju vlastiti izvorni projekt, bez zajedničkog runtime okruženja i baze podataka.
+# KRENI — izrada i instalacija
 
 ## Android
 
-Zahtijeva Java 17, Android SDK i Gradle 8.14.3.
+Izvor: [Android projekt](../android/) (Kotlin / Jetpack Compose), verzija 0.0.3.
 
-```bash
-cd android
-gradle :app:testDebugUnitTest :app:assembleRelease
-```
+Na računalu s Android SDK, JDK 17 i Gradle 8.14.3, komande: cd android; gradle :app:testDebugUnitTest :app:assembleDebug :app:assembleRelease :app:bundleRelease.
 
-Gradle bez konfiguriranog release ključa izrađuje **nepotpisani APK**. Za stvarnu distribuciju treba konfigurirati trajni release keystore i signingConfig putem sigurnih GitHub Secrets, bez pohranjivanja ključeva u repozitorij.
+| Datoteka izdanja | Svrha |
+| --- | --- |
+| KRENI-Android-v0.0.3-installable-test.apk | Digitalno potpisani APK za testiranje, automatski instaliran na Android emulator |
+| KRENI-Android-v0.0.3-release-signed.apk | Distribucijski APK, samo ako su dostupni trajni signing ključevi |
+| KRENI-Android-v0.0.3-play-signed.aab | Google Play AAB, samo kad su dostupni trajni signing ključevi |
+| KRENI-Android-v0.0.3-unsigned.aab | AAB bez distribucijskog potpisa, za naknadno potpisivanje |
+| KRENI-Android-v0.0.3-source.zip | Izvorni Android projekt i zajednički podaci |
+
+AAB se ne instalira kao obični APK. GitHub Secrets nazivi:
+- KRENI_ANDROID_KEYSTORE_BASE64 (base64 datoteka JKS)
+- KRENI_ANDROID_KEYSTORE_PASSWORD
+- KRENI_ANDROID_KEY_ALIAS
+- KRENI_ANDROID_KEY_PASSWORD
+
+Bez sve četiri tajne CI isporučuje instalacijski testni APK i nepotpisani AAB. **Testni ključ nije namijenjen produkcijskoj distribuciji** i može se razlikovati između novih buildova. Nadogradnja aplikacije s različitim potpisom može zahtijevati uklanjanje stare instalacije, uz gubitak lokalnih postavki. Trajni produkcijski ključ ostaje izvan repozitorija.
 
 ## iOS
 
-Zahtijeva macOS, Xcode i XcodeGen.
+Izvor: [iOS projekt](../ios/), Swift / SwiftUI i XcodeGen. Za build su potrebni macOS, Xcode i XcodeGen.
 
-```bash
-cd ios
-xcodegen generate
-xcodebuild -project KRENI.xcodeproj -scheme KRENI -configuration Release \
-  -sdk iphoneos -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build
-```
+1. Iz korijena repozitorija izvrši: python3 tool/create_app_icons.py
+2. U mapi ios izvrši: xcodegen generate
+3. Otvori Xcode projekt i odaberi odgovarajući cilj.
 
-Bez Apple Distribution certifikata/provisioning profila rezultat se ne može distribuirati kao instalacijski IPA u App Storeu. GitHub objavljuje ZIP nepotpisane aplikacije i izvorni iOS projekt.
+| Datoteka izdanja | Svrha |
+| --- | --- |
+| KRENI-iOS-v0.0.3-source.zip | Xcode projekt i zajednički podaci |
+| KRENI-iOS-v0.0.3-simulator.zip | Aplikacija za Apple simulator |
+| KRENI-iOS-v0.0.3-unsigned.xcarchive.zip | Uređajska arhiva bez potpisa |
+| KRENI-iOS-v0.0.3-unsigned.ipa | Nepotpisana IPA arhiva, ne može se instalirati na fizički iPhone |
 
-## Podatkovne provjere
+Instalacijski iPhone IPA ili TestFlight/App Store distribucija zahtijevaju Apple Developer certifikat i odgovarajući provisioning profil. Dok ih nema, nijedan nepotpisani ZIP/IPA ne predstavlja se kao instalacijski.
 
-```bash
-python3 pipeline/validate_catalog.py
-python3 -m unittest discover -s pipeline -p 'test_*.py' -v
-python3 -m pipeline.gtfs approved-feed.zip --provider provider-id --date 2026-10-09 --output schedule.json
-```
+## Automatizirana provjera
 
-Import je namijenjen isključivo arhivama s potvrđenim pravom uporabe i važećim kalendarom. Ne sprema se SQL baza.
+CI izvršava testove kataloga i GTFS validacije, Gradle testove, Android APK/AAB build, digitalnu provjeru APK-a, instalaciju/pokretanje u emulatoru, iOS kompilaciju za simulator i uređaj, pokretanje u simulatoru te snimanje stvarnih zaslona.
 
-## Testiranje prije objave u trgovinama
+Snimke zaslona nisu umjetno generirane. Nakon provjere njihovog PNG formata, GitHub Actions sprema ih u mapu docs/screenshots i umeće poveznice u README.
 
-- Potvrditi sigurno pokretanje na stvarnim Android/iOS uređajima.
-- Provjeriti offline ponašanje, manji/veći zaslon, VoiceOver/TalkBack, tamnu temu i pristupačnost.
-- Provjeriti zahtjeve za obavijesti tek nakon uključivanja pouzdanih izvora; nema generičkih obavijesti.
-- Potvrditi certifikate, potpise, identitete aplikacija, ikone, zaslone i crash logove.
-- Prije produkcijskog skaliranja provjeriti ugovor i kapacitet kartografskog pružatelja.
+## Završni produkcijski QA
+
+Prije javne distribucije potrebno je provesti testove na stvarnim Android i iPhone uređajima, TalkBack/VoiceOver, promjene veličine fontova, rad bez mreže, prijelaze u pozadinu, crash logove, potpise, integracije s prijevoznicima i kartografske licence.

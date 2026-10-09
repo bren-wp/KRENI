@@ -4,7 +4,26 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+val signingStore = System.getenv("KRENI_SIGNING_STORE")
+val signingPassword = System.getenv("KRENI_SIGNING_PASSWORD")
+val signingAlias = System.getenv("KRENI_SIGNING_ALIAS")
+val signingKeyPassword = System.getenv("KRENI_SIGNING_KEY_PASSWORD")
+val hasProductionSigning = listOf(signingStore, signingPassword, signingAlias, signingKeyPassword)
+    .all { !it.isNullOrBlank() }
+
 android {
+    signingConfigs {
+        if (hasProductionSigning) {
+            create("production") {
+                storeFile = file(requireNotNull(signingStore))
+                storePassword = requireNotNull(signingPassword)
+                keyAlias = requireNotNull(signingAlias)
+                keyPassword = requireNotNull(signingKeyPassword)
+                enableV1Signing = true
+                enableV2Signing = true
+            }
+        }
+    }
     namespace = "hr.brendigo.kreni"
     compileSdk = 36
 
@@ -12,8 +31,8 @@ android {
         applicationId = "hr.brendigo.kreni"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.0.2"
+        versionCode = 3
+        versionName = "0.0.3"
     }
 
     buildFeatures { compose = true }
@@ -28,6 +47,9 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            if (hasProductionSigning) {
+                signingConfig = signingConfigs.getByName("production")
+            }
         }
     }
     packaging {

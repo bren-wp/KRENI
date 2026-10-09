@@ -9,7 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.filled.AltRoute
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
         val settings = Settings(this, catalog)
         setContent {
             var prefs by remember { mutableStateOf(settings.read()) }
-            var selectedTab by remember { mutableIntStateOf(0) }
+            var selectedTab by remember { mutableIntStateOf(intent?.getIntExtra("kreni_capture_tab", 0)?.coerceIn(0, 3) ?: 0) }
             var chosenStop by remember { mutableStateOf<Stop?>(null) }
             val city = catalog.cities.firstOrNull { it.id == prefs.city } ?: catalog.cities.first()
             val surface = if (prefs.dark) Navy else Color(0xFFF4F7FC)
@@ -173,7 +173,7 @@ private fun Hero(onPlan: () -> Unit) {
             Spacer(Modifier.height(18.dp))
             Button(onClick = onPlan, modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Aqua, contentColor = Navy)) {
-                Icon(Icons.Default.AltRoute, null)
+                Icon(Icons.AutoMirrored.Filled.AltRoute, null)
                 Spacer(Modifier.width(8.dp))
                 Text("Planiraj put")
             }

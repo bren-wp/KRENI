@@ -1,12 +1,16 @@
-# Promjene
+# KRENI — promjene
 
-## 0.0.2 — 2026-10-09
-- Dva odvojena projekta: Android (Kotlin/Jetpack Compose) i iOS (Swift/SwiftUI).
-- Zajednički katalog gradova, stanica i luka; lokalni JSON favoriti i postavke.
-- MapLibre prikaz za Android, Apple Maps za iOS, osvježeni KRENI identitet.
-- GTFS ZIP validator, provjera vremenske zone, kalendara i presjedanja na potvrđenim polascima.
-- GitHub Actions pipeline i zasebne arhive za Android i iOS.
-- Statusi izvora podataka i zaštita od prikazivanja lažnih GPS/voznorednih informacija.
+## v0.0.3 — 2026-10-09
+- Digitalno potpisani testni Android APK i provjera instalacije u emulatoru.
+- Android AAB te opcionalno trajno produkcijsko potpisivanje.
+- iOS simulator, uređajska xcarchive arhiva, nepotpisani IPA.
+- iOS KRENI ikona i početni zaslon.
+- Stvarne snimke zaslona obiju aplikacija za README.
+- Ujednačene verzije i provjere preuzimanja prije GitHub izdanja.
 
-## 0.0.1 — 2026-10-09
-- Prva javna verzija KRENI aplikacije i vizualnog identiteta.
+## v0.0.2 — 2026-10-09
+- Android Kotlin/Compose i iOS Swift/SwiftUI projekti.
+- Katalog stanica, lokalna JSON pohrana i GTFS validacija.
+
+## v0.0.1 — 2026-10-09
+- Početna verzija projekta KRENI.

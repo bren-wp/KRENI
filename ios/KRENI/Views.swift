@@ -3,7 +3,15 @@ import MapKit
 
 struct RootView: View {
     @EnvironmentObject private var state: AppState
-    @State private var selection = 0
+    @State private var selection: Int = {
+        #if DEBUG
+        let arguments = ProcessInfo.processInfo.arguments
+        if arguments.contains("-KRENI_CAPTURE_MAP") { return 1 }
+        if arguments.contains("-KRENI_CAPTURE_DEPARTURES") { return 2 }
+        if arguments.contains("-KRENI_CAPTURE_MORE") { return 3 }
+        #endif
+        return 0
+    }()
     @State private var focusedStop: Stop?
 
     var body: some View {

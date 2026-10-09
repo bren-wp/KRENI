@@ -1,4 +1,4 @@
-name: KRENI · Android & iOS
+name: KRENI Android iOS release
 
 on:
   push:
@@ -16,17 +16,14 @@ concurrency:
 
 jobs:
   data:
-    name: Data integrity / journey graph
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Catalog / GTFS / router tests
-        run: |
+      - run: |
           python3 pipeline/validate_catalog.py
           python3 -m unittest discover -s pipeline -p 'test_*.py' -v
 
   android:
-    name: Android · Kotlin / Compose
     runs-on: ubuntu-latest
     needs: data
     steps:
@@ -35,7 +32,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Android SDK
+      - name: Install SDK
         run: |
           test -n "$ANDROID_HOME"
           SDK_MANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | head -n 1)"
@@ -44,62 +41,183 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.14.3'
-      - name: Compile / test / assemble
+      - name: Optional production signing
+        env:
+          STORE_B64: ${{ secrets.KRENI_ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.KRENI_ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KRENI_ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KRENI_ANDROID_KEY_PASSWORD }}
+        shell: bash
+        run: |
+          if [[ -n "$STORE_B64" && -n "$STORE_PASSWORD" && -n "$KEY_ALIAS" && -n "$KEY_PASSWORD" ]]; then
+            printf '%s' "$STORE_B64" | base64 --decode > "$RUNNER_TEMP/kreni-release.jks"
+            chmod 600 "$RUNNER_TEMP/kreni-release.jks"
+            echo "KRENI_SIGNING_STORE=$RUNNER_TEMP/kreni-release.jks" >> "$GITHUB_ENV"
+            echo "KRENI_SIGNING_PASSWORD=$STORE_PASSWORD" >> "$GITHUB_ENV"
+            echo "KRENI_SIGNING_ALIAS=$KEY_ALIAS" >> "$GITHUB_ENV"
+            echo "KRENI_SIGNING_KEY_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"
+            echo "KRENI_SIGNED_RELEASE=yes" >> "$GITHUB_ENV"
+          else
+            echo "No distribution key. An installable test APK will be provided."
+          fi
+      - name: Test, APK and AAB
         working-directory: android
+        run: gradle --no-daemon :app:testDebugUnitTest :app:assembleDebug :app:assembleRelease :app:bundleRelease
+      - name: Verify signing and package Android files
+        shell: bash
         run: |
-          gradle --no-daemon :app:testDebugUnitTest :app:assembleRelease
-      - name: Verify Android package
-        run: |
-          mkdir -p dist
-          test -s android/app/build/outputs/apk/release/app-release-unsigned.apk
-          cp android/app/build/outputs/apk/release/app-release-unsigned.apk dist/KRENI-Android-v0.0.2-unsigned.apk
-          test -s dist/KRENI-Android-v0.0.2-unsigned.apk
-          (cd android && zip -qr ../dist/KRENI-Android-v0.0.2-source.zip . -x '*/build/*' '.gradle/*')
+          set -euo pipefail
+          mkdir -p dist/android
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose android/app/build/outputs/apk/debug/app-debug.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk dist/android/KRENI-Android-v0.0.3-installable-test.apk
+          test -s android/app/build/outputs/bundle/release/app-release.aab
+          if [[ "${KRENI_SIGNED_RELEASE:-}" == "yes" ]]; then
+            test -s android/app/build/outputs/apk/release/app-release.apk
+            "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose android/app/build/outputs/apk/release/app-release.apk
+            cp android/app/build/outputs/apk/release/app-release.apk dist/android/KRENI-Android-v0.0.3-release-signed.apk
+            cp android/app/build/outputs/bundle/release/app-release.aab dist/android/KRENI-Android-v0.0.3-play-signed.aab
+            jarsigner -verify -strict dist/android/KRENI-Android-v0.0.3-play-signed.aab
+          else
+            cp android/app/build/outputs/bundle/release/app-release.aab dist/android/KRENI-Android-v0.0.3-unsigned.aab
+          fi
+          zip -qr dist/android/KRENI-Android-v0.0.3-source.zip android data assets docs/BUILD.md -x 'android/**/build/*' 'android/**/.gradle/*'
+      - name: Verify real installation, launch and screenshot Android
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: |
+            set -e
+            adb install -r dist/android/KRENI-Android-v0.0.3-installable-test.apk
+            mkdir -p dist/screenshots/android
+            for item in home:0 map:1 departures:2 more:3; do
+              name="${item%%:*}"
+              index="${item##*:}"
+              adb shell am force-stop hr.brendigo.kreni || true
+              adb shell am start -W -n hr.brendigo.kreni/.MainActivity --ei kreni_capture_tab "$index"
+              sleep 5
+              adb shell pidof hr.brendigo.kreni
+              adb exec-out screencap -p > "dist/screenshots/android/$name.png"
+              test -s "dist/screenshots/android/$name.png"
+            done
       - uses: actions/upload-artifact@v4
         with:
-          name: kreni-android-0.0.2
-          path: dist/KRENI-Android-v0.0.2-*
+          name: kreni-android-packages-0.0.3
+          path: dist/android/*
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kreni-android-screens-0.0.3
+          path: dist/screenshots/android/*
           if-no-files-found: error
 
   ios:
-    name: iOS · Swift / SwiftUI
     runs-on: macos-15
     needs: data
     steps:
       - uses: actions/checkout@v4
-      - name: Generate Xcode project
+      - name: Brand and Xcode
         run: |
           brew install xcodegen
+          python3 tool/create_app_icons.py
           (cd ios && xcodegen generate)
-      - name: iOS simulator compile
+      - name: Build iOS simulator
         run: |
           xcodebuild -project ios/KRENI.xcodeproj -scheme KRENI -configuration Debug \
             -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath ios/build CODE_SIGNING_ALLOWED=NO build
-      - name: iOS device release
+      - name: Build iOS device archive
         run: |
-          xcodebuild -project ios/KRENI.xcodeproj -scheme KRENI -configuration Release \
-            -sdk iphoneos -destination 'generic/platform=iOS' \
-            -derivedDataPath ios/build CODE_SIGNING_ALLOWED=NO build
-      - name: Verify iOS package
+          xcodebuild archive -project ios/KRENI.xcodeproj -scheme KRENI \
+            -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
+            -archivePath ios/build/KRENI.xcarchive CODE_SIGNING_ALLOWED=NO
+      - name: Launch in iOS simulator and capture real screens
+        shell: bash
         run: |
-          mkdir -p dist
-          test -d ios/build/Build/Products/Release-iphoneos/KRENI.app
-          ditto -c -k --keepParent ios/build/Build/Products/Release-iphoneos/KRENI.app \
-            dist/KRENI-iOS-v0.0.2-unsigned.zip
-          test -s dist/KRENI-iOS-v0.0.2-unsigned.zip
-          (cd ios && zip -qr ../dist/KRENI-iOS-v0.0.2-source.zip . \
-            -x 'build/*' 'KRENI.xcodeproj/*' '.DS_Store')
+          set -euo pipefail
+          SIMULATOR="$(xcrun simctl list devices available -j | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next((x["udid"] for row in d["devices"].values() for x in row if x["name"].startswith("iPhone") and x["state"] == "Shutdown"), ""))')"
+          test -n "$SIMULATOR"
+          xcrun simctl boot "$SIMULATOR"
+          xcrun simctl bootstatus "$SIMULATOR" -b
+          xcrun simctl ui "$SIMULATOR" appearance light
+          xcrun simctl install "$SIMULATOR" ios/build/Build/Products/Debug-iphonesimulator/KRENI.app
+          mkdir -p dist/screenshots/ios
+          for item in home map departures more; do
+            xcrun simctl terminate "$SIMULATOR" hr.brendigo.kreni || true
+            if [[ "$item" == home ]]; then
+              xcrun simctl launch "$SIMULATOR" hr.brendigo.kreni
+            else
+              name="$(echo "$item" | tr '[:lower:]' '[:upper:]')"
+              xcrun simctl launch "$SIMULATOR" hr.brendigo.kreni "-KRENI_CAPTURE_$name"
+            fi
+            sleep 5
+            xcrun simctl io "$SIMULATOR" screenshot "dist/screenshots/ios/$item.png"
+            test -s "dist/screenshots/ios/$item.png"
+          done
+          xcrun simctl shutdown "$SIMULATOR"
+      - name: Package device, simulator, IPA and source
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist/ios
+          APP=ios/build/KRENI.xcarchive/Products/Applications/KRENI.app
+          test -s "$APP/KRENI"
+          ditto -c -k --keepParent ios/build/KRENI.xcarchive dist/ios/KRENI-iOS-v0.0.3-unsigned.xcarchive.zip
+          ditto -c -k --keepParent ios/build/Build/Products/Debug-iphonesimulator/KRENI.app dist/ios/KRENI-iOS-v0.0.3-simulator.zip
+          mkdir -p dist/payload/Payload
+          ditto "$APP" dist/payload/Payload/KRENI.app
+          (cd dist/payload && zip -qry ../ios/KRENI-iOS-v0.0.3-unsigned.ipa Payload)
+          zip -qr dist/ios/KRENI-iOS-v0.0.3-source.zip ios data assets tool/create_app_icons.py docs/BUILD.md -x 'ios/build/*' 'ios/KRENI.xcodeproj/*'
+          for f in dist/ios/*; do test -s "$f"; done
       - uses: actions/upload-artifact@v4
         with:
-          name: kreni-ios-0.0.2
-          path: dist/KRENI-iOS-v0.0.2-*
+          name: kreni-ios-packages-0.0.3
+          path: dist/ios/*
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kreni-ios-screens-0.0.3
+          path: dist/screenshots/ios/*
           if-no-files-found: error
 
-  release:
-    name: Release v0.0.2
+  screenshots:
     runs-on: ubuntu-latest
-    needs: [data, android, ios]
+    needs: [android, ios]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: kreni-android-screens-0.0.3
+          path: docs/screenshots/android
+      - uses: actions/download-artifact@v4
+        with:
+          name: kreni-ios-screens-0.0.3
+          path: docs/screenshots/ios
+      - name: Validate actual captures and improve README
+        run: python3 tool/publish_screenshots.py
+      - name: Commit screenshots to GitHub
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/screenshots README.md
+          if ! git diff --cached --quiet; then
+            git commit -m "docs: capture Android and iOS screens from simulators [skip ci]"
+            git push origin HEAD:main
+          fi
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [data, android, ios, screenshots]
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     permissions:
       contents: write
@@ -107,33 +225,33 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          pattern: kreni-*-0.0.2
-          path: dist
-          merge-multiple: true
-      - name: Verify every deliverable
+          name: kreni-android-packages-0.0.3
+          path: dist/android
+      - uses: actions/download-artifact@v4
+        with:
+          name: kreni-ios-packages-0.0.3
+          path: dist/ios
+      - name: Verify artifacts
         run: |
-          for f in \
-            dist/KRENI-Android-v0.0.2-unsigned.apk \
-            dist/KRENI-Android-v0.0.2-source.zip \
-            dist/KRENI-iOS-v0.0.2-unsigned.zip \
-            dist/KRENI-iOS-v0.0.2-source.zip
-          do
-            test -s "$f"
-          done
-      - name: Publish pre-release only after both successful builds
+          set -e
+          test -s dist/android/KRENI-Android-v0.0.3-installable-test.apk
+          test -s dist/android/KRENI-Android-v0.0.3-source.zip
+          ls dist/android/*.aab >/dev/null
+          test -s dist/ios/KRENI-iOS-v0.0.3-unsigned.ipa
+          test -s dist/ios/KRENI-iOS-v0.0.3-unsigned.xcarchive.zip
+          test -s dist/ios/KRENI-iOS-v0.0.3-simulator.zip
+          test -s dist/ios/KRENI-iOS-v0.0.3-source.zip
+      - name: Publish immutable pre-release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view v0.0.2 >/dev/null 2>&1; then
-            echo "v0.0.2 exists; not overwriting existing assets"
+          if gh release view v0.0.3 >/dev/null 2>&1; then
+            echo "v0.0.3 exists; skipping."
           else
-            gh release create v0.0.2 \
-              --target "$GITHUB_SHA" \
-              --title "KRENI v0.0.2 — Android & iOS" \
+            gh release create v0.0.3 \
+              --target main \
+              --title "KRENI v0.0.3 — Android APK / AAB / iOS" \
               --prerelease \
               --notes-file RELEASE_NOTES.md \
-              dist/KRENI-Android-v0.0.2-unsigned.apk \
-              dist/KRENI-Android-v0.0.2-source.zip \
-              dist/KRENI-iOS-v0.0.2-unsigned.zip \
-              dist/KRENI-iOS-v0.0.2-source.zip
+              dist/android/* dist/ios/*
           fi
