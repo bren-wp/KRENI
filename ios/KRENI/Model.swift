@@ -65,13 +65,16 @@ final class AppState: ObservableObject {
         let fallback = Catalog(schemaVersion: 1, cities: [
             City(id: "zagreb", name: "Zagreb", lat: 45.8131, lon: 15.9775, trams: true)
         ], stops: [])
-        catalog = (try? Catalog.load()) ?? fallback
+        let loaded = (try? Catalog.load()) ?? fallback
         let pref = Self.read()
-        selectedCity = catalog.cities.contains(where: { $0.id == pref.city }) ?
-            pref.city : catalog.cities[0].id
-        favorites = Set(pref.favorites.filter { id in
-            catalog.stops.contains(where: { $0.id == id })
+        let chosenCity = loaded.cities.contains(where: { $0.id == pref.city }) ?
+            pref.city : loaded.cities[0].id
+        let safeFavorites = Set(pref.favorites.filter { id in
+            loaded.stops.contains(where: { $0.id == id })
         })
+        catalog = loaded
+        selectedCity = chosenCity
+        favorites = safeFavorites
         dark = pref.dark
     }
 
