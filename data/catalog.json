@@ -1,0 +1,284 @@
+{
+  "schemaVersion": 1,
+  "cities": [
+    {
+      "id": "zagreb",
+      "name": "Zagreb",
+      "lat": 45.8131,
+      "lon": 15.9775,
+      "trams": true
+    },
+    {
+      "id": "rijeka",
+      "name": "Rijeka",
+      "lat": 45.3271,
+      "lon": 14.4422,
+      "trams": false
+    },
+    {
+      "id": "split",
+      "name": "Split",
+      "lat": 43.5081,
+      "lon": 16.4402,
+      "trams": false
+    },
+    {
+      "id": "osijek",
+      "name": "Osijek",
+      "lat": 45.555,
+      "lon": 18.6955,
+      "trams": true
+    },
+    {
+      "id": "zadar",
+      "name": "Zadar",
+      "lat": 44.1194,
+      "lon": 15.2314,
+      "trams": false
+    },
+    {
+      "id": "dubrovnik",
+      "name": "Dubrovnik",
+      "lat": 42.6507,
+      "lon": 18.0944,
+      "trams": false
+    },
+    {
+      "id": "pula",
+      "name": "Pula",
+      "lat": 44.8666,
+      "lon": 13.8496,
+      "trams": false
+    },
+    {
+      "id": "sibenik",
+      "name": "Šibenik",
+      "lat": 43.735,
+      "lon": 15.8952,
+      "trams": false
+    },
+    {
+      "id": "varazdin",
+      "name": "Varaždin",
+      "lat": 46.3057,
+      "lon": 16.3366,
+      "trams": false
+    },
+    {
+      "id": "karlovac",
+      "name": "Karlovac",
+      "lat": 45.4929,
+      "lon": 15.5553,
+      "trams": false
+    }
+  ],
+  "stops": [
+    {
+      "id": "zg-glavni",
+      "city": "zagreb",
+      "name": "Glavni kolodvor",
+      "lat": 45.8049,
+      "lon": 15.9792,
+      "modes": [
+        "tram",
+        "train"
+      ]
+    },
+    {
+      "id": "zg-trg",
+      "city": "zagreb",
+      "name": "Trg bana J. Jelačića",
+      "lat": 45.8132,
+      "lon": 15.9775,
+      "modes": [
+        "tram"
+      ]
+    },
+    {
+      "id": "zg-ak",
+      "city": "zagreb",
+      "name": "Autobusni kolodvor",
+      "lat": 45.803,
+      "lon": 15.993,
+      "modes": [
+        "bus"
+      ]
+    },
+    {
+      "id": "ri-zabica",
+      "city": "rijeka",
+      "name": "Žabica",
+      "lat": 45.3286,
+      "lon": 14.436,
+      "modes": [
+        "bus"
+      ]
+    },
+    {
+      "id": "ri-hz",
+      "city": "rijeka",
+      "name": "Željeznički kolodvor",
+      "lat": 45.3302,
+      "lon": 14.4306,
+      "modes": [
+        "train"
+      ]
+    },
+    {
+      "id": "ri-luka",
+      "city": "rijeka",
+      "name": "Putnička luka",
+      "lat": 45.324,
+      "lon": 14.441,
+      "modes": [
+        "ferry",
+        "catamaran"
+      ]
+    },
+    {
+      "id": "st-ak",
+      "city": "split",
+      "name": "Autobusni kolodvor",
+      "lat": 43.5043,
+      "lon": 16.4436,
+      "modes": [
+        "bus"
+      ]
+    },
+    {
+      "id": "st-hz",
+      "city": "split",
+      "name": "Željeznički kolodvor",
+      "lat": 43.5041,
+      "lon": 16.4434,
+      "modes": [
+        "train"
+      ]
+    },
+    {
+      "id": "st-luka",
+      "city": "split",
+      "name": "Trajektna luka",
+      "lat": 43.503,
+      "lon": 16.441,
+      "modes": [
+        "ferry",
+        "catamaran"
+      ]
+    },
+    {
+      "id": "os-trg",
+      "city": "osijek",
+      "name": "Trg Ante Starčevića",
+      "lat": 45.5603,
+      "lon": 18.6756,
+      "modes": [
+        "tram"
+      ]
+    },
+    {
+      "id": "os-hz",
+      "city": "osijek",
+      "name": "Željeznički kolodvor",
+      "lat": 45.5487,
+      "lon": 18.68,
+      "modes": [
+        "train"
+      ]
+    },
+    {
+      "id": "zd-luka",
+      "city": "zadar",
+      "name": "Gradska luka",
+      "lat": 44.118,
+      "lon": 15.227,
+      "modes": [
+        "ferry",
+        "catamaran"
+      ]
+    },
+    {
+      "id": "zd-ak",
+      "city": "zadar",
+      "name": "Autobusni kolodvor",
+      "lat": 44.1067,
+      "lon": 15.2391,
+      "modes": [
+        "bus"
+      ]
+    },
+    {
+      "id": "du-luka",
+      "city": "dubrovnik",
+      "name": "Luka Gruž",
+      "lat": 42.6589,
+      "lon": 18.087,
+      "modes": [
+        "ferry",
+        "catamaran"
+      ]
+    },
+    {
+      "id": "du-ak",
+      "city": "dubrovnik",
+      "name": "Autobusni kolodvor Gruž",
+      "lat": 42.66,
+      "lon": 18.0849,
+      "modes": [
+        "bus"
+      ]
+    },
+    {
+      "id": "pu-hz",
+      "city": "pula",
+      "name": "Željeznički kolodvor",
+      "lat": 44.8753,
+      "lon": 13.85,
+      "modes": [
+        "train"
+      ]
+    },
+    {
+      "id": "pu-luka",
+      "city": "pula",
+      "name": "Putnička luka",
+      "lat": 44.874,
+      "lon": 13.847,
+      "modes": [
+        "ferry",
+        "catamaran"
+      ]
+    },
+    {
+      "id": "si-luka",
+      "city": "sibenik",
+      "name": "Luka Šibenik",
+      "lat": 43.7331,
+      "lon": 15.891,
+      "modes": [
+        "ferry",
+        "catamaran"
+      ]
+    },
+    {
+      "id": "vz-hz",
+      "city": "varazdin",
+      "name": "Željeznički kolodvor",
+      "lat": 46.3039,
+      "lon": 16.3405,
+      "modes": [
+        "train"
+      ]
+    },
+    {
+      "id": "ka-hz",
+      "city": "karlovac",
+      "name": "Željeznički kolodvor",
+      "lat": 45.4927,
+      "lon": 15.5467,
+      "modes": [
+        "train"
+      ]
+    }
+  ]
+}

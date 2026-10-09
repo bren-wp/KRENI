@@ -1,18 +1,26 @@
-# KRENI v0.0.1 — prvi razvojni pre-release
+# KRENI v0.0.2 — Android i iOS
 
-**Cijela Hrvatska. Jedno putovanje.** KRENI donosi početni identitet i Android/iOS aplikaciju za jednostavniji pregled javnog prijevoza Hrvatske.
+Jednostavan pregled javnog prijevoza Hrvatske u dvije zasebne aplikacije.
 
-### Uključeno
-- Flutter sučelje s početnom stranicom, kartom, polascima, planerom i postavkama
-- Orijentacijske lokacije kolodvora, stanica i luka u više gradova
-- Lokalni favoriti i tema, bez korisničkih računa ili vlastite baze
-- Osnovni HTTPS/JSON adapter za buduće legitimne izvore podataka
-- KRENI vizualni identitet i marketinška dokumentacija
+## Android
+- Kotlin i Jetpack Compose
+- KRENI vizualni identitet, početni ekran, karta, polasci, favoriti i postavke
+- Privatna JSON pohrana; bez registracije
 
-### Važne napomene
-- Službeni vozni redovi i vozila uživo nisu povezani.
-- Prikaz lokacija je informativan, a planer ne računa stvarna presjedanja.
-- Android APK služi za testiranje; iOS ZIP nije potpisan niti instalacijski IPA.
-- Projekt nije službena aplikacija HŽPP-a, ZET-a, Jadrolinije ili drugih prijevoznika.
+## iOS
+- Swift i SwiftUI
+- Apple Maps, početni ekran, karta, polasci, favoriti i postavke
+- Privatna JSON pohrana; bez registracije
 
-Sljedeći korak: verificirani feedovi i QA na fizičkim uređajima.
+## Podatkovni sustav
+- Jedinstven verzionirani katalog gradova i stajališta
+- GTFS ZIP validacija kalendara, vremenskih zona, identifikatora i presjedanja iz stvarnih podataka
+- Jasan izvor i status informacija; bez lažnih procjena dolaska
+
+## Distribucija
+
+Četiri datoteke: Android APK i arhiva projekta te iOS aplikacijska arhiva i arhiva projekta.
+
+**Potpisivanje:** ako GitHub nema konfigurirane potpisne certifikate, isporučeni artefakti ostaju nepotpisani. Android APK nije predviđen za neposrednu instalaciju, a iOS arhiva nije potpisani IPA. Ne objavljuju se kao spremni paketi za Play Store/App Store.
+
+Za promet u stvarnom vremenu, rute i obavijesti potrebni su potvrđeni izvori. Izdanje je početna baza za daljnje proširenje.

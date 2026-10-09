@@ -1,11 +1,10 @@
-# Privatnost KRENI
+# Privatnost
 
-KRENI v0.0.1 ne zahtijeva prijavu i ne koristi vlastitu bazu podataka, analitiku niti oglasne identifikatore.
+KRENI ne zahtijeva registraciju i ne koristi vlastitu bazu podataka, Firebase, Supabase, analitičke SDK-ove ili oglasne identifikatore.
 
-- **Lokalno:** odabrani grad, tamna tema i favoriti spremaju se u privatnu JSON datoteku aplikacije.
-- **Mreža:** prikaz karte učitava pločice s OpenStreetMap poslužitelja, pri čemu mrežni poslužitelj može obrađivati IP adresu i tehničke podatke o zahtjevu prema vlastitim pravilima.
-- **Budući feed:** ako razvojni graditelj uključi HTTPS izvor voznih redova, aplikacija komunicira s tim vanjskim izvorom.
-- **Lokacija uređaja:** v0.0.1 ne traži GPS dozvolu ni pozadinsko praćenje lokacije.
-- **Brisanje:** brisanjem podataka aplikacije uklanja se lokalni JSON. Unutar aplikacije favoriti se mogu ukloniti pojedinačno.
-
-Za produkcijsku objavu potrebno je proširiti obavijest prema stvarno aktiviranim integracijama i pravilima pružatelja usluga.
+- Izbor grada, tema i spremljene lokacije ostaju u privatnoj JSON datoteci uređaja.
+- Kartografske aplikacije mogu razmjenjivati mrežne zahtjeve s pružateljem karte. KRENI ne zahtijeva pristup GPS lokaciji uređaja.
+- Na Androidu karta koristi MapLibre, a na iOS-u MapKit. Prije produkcijske distribucije potrebno je potvrditi vanjske uvjete pružatelja pločica.
+- KRENI ne prikuplja ime, adresu e-pošte, telefonski broj ni podatke za plaćanje.
+- Brisanjem podataka aplikacije brišu se lokalne postavke i favoriti.
+- Buduće integracije za vozne redove moraju biti HTTPS i s valjanim uvjetima korištenja.

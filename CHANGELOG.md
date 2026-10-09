@@ -1,13 +1,12 @@
-# Dnevnik promjena
+# Promjene
 
-## [0.0.1] — 2026-10-09
+## 0.0.2 — 2026-10-09
+- Dva odvojena projekta: Android (Kotlin/Jetpack Compose) i iOS (Swift/SwiftUI).
+- Zajednički katalog gradova, stanica i luka; lokalni JSON favoriti i postavke.
+- MapLibre prikaz za Android, Apple Maps za iOS, osvježeni KRENI identitet.
+- GTFS ZIP validator, provjera vremenske zone, kalendara i presjedanja na potvrđenim polascima.
+- GitHub Actions pipeline i zasebne arhive za Android i iOS.
+- Statusi izvora podataka i zaštita od prikazivanja lažnih GPS/voznorednih informacija.
 
-### Dodano
-- Flutter projekt za Android i iOS
-- Jedinstveni KRENI SVG identitet, automatski generirane ikone/splash, marketinški README i koncepti ekrana
-- Početna stranica, gradovi, katalog informativnih lokacija i favoriti
-- OpenStreetMap karta i filtri po vrsti prijevoza
-- Osnovni planer s orijentacijskom zračnom udaljenošću
-- Početna arhitektura HTTPS/JSON feedova bez vlastite baze
-- Lokalna JSON pohrana, tema aplikacije i zaštita od oštećenih postavki
-- GitHub Actions provjere i uvjetno izdanje v0.0.1
+## 0.0.1 — 2026-10-09
+- Prva javna verzija KRENI aplikacije i vizualnog identiteta.
