@@ -18,10 +18,8 @@ class CatalogTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun rejectsDuplicateStopId() {
-        val bad = sample.replace(
-            "]}",
-            """},{"id":"a","city":"zagreb","name":"Duplikat","lat":45.8,"lon":15.9,"modes":["bus"]}]}"""
-        )
+        val duplicate = """{"id":"a","city":"zagreb","name":"Duplikat","lat":45.8,"lon":15.9,"modes":["bus"]}"""
+        val bad = sample.replace("}]}", "}," + duplicate + "]}")
         CatalogReader.parse(bad)
     }
 }
