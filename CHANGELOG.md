@@ -1,4 +1,12 @@
-# KRENI — promjene
+# Promjene
+
+## v0.0.4 — 2026-10-09
+- Zajednički sloj za praćenje vozila i minute dolaska u Android i iOS aplikaciji.
+- Kartografski markeri za verified GPS položaje, kontrola svježine 90 sekundi.
+- Precizno razlikovanje procjene od planiranog polaska, bez izmišljanja procjena.
+- Siguran HTTPS snapshot adapter i zaštita od zastarjelih podataka.
+- QA i osvježeni stvarni prikazi obiju platformi.
+- Izvori bez potvrđenih produkcijskih dozvola ostaju isključeni.
 
 ## v0.0.3 — 2026-10-09
 - Digitalno potpisani testni Android APK i provjera instalacije u emulatoru.

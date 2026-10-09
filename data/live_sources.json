@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "refreshSeconds": 30,
+  "providers": [
+    {
+      "id": "zet",
+      "city": "zagreb",
+      "enabled": false,
+      "endpoint": null
+    },
+    {
+      "id": "autotrolej",
+      "city": "rijeka",
+      "enabled": false,
+      "endpoint": null
+    },
+    {
+      "id": "promet-split",
+      "city": "split",
+      "enabled": false,
+      "endpoint": null
+    },
+    {
+      "id": "gpp",
+      "city": "osijek",
+      "enabled": false,
+      "endpoint": null
+    },
+    {
+      "id": "hzpp",
+      "city": "zagreb",
+      "enabled": false,
+      "endpoint": null
+    },
+    {
+      "id": "jadrolinija",
+      "city": "split",
+      "enabled": false,
+      "endpoint": null
+    }
+  ]
+}

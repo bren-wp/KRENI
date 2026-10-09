@@ -13,6 +13,7 @@ struct RootView: View {
         return 0
     }()
     @State private var focusedStop: Stop?
+    @StateObject private var live = LiveStore()
 
     var body: some View {
         TabView(selection: $selection) {
@@ -35,6 +36,13 @@ struct RootView: View {
                 selection = 1
             })
             .tabItem { Label("Više", systemImage: "person.fill") }.tag(3)
+        }
+        .environmentObject(live)
+        .task(id: state.selectedCity) {
+            while !Task.isCancelled {
+                await live.refresh(city: state.selectedCity)
+                try? await Task.sleep(nanoseconds: 30_000_000_000)
+            }
         }
     }
 }
@@ -162,6 +170,7 @@ struct StopRow: View {
 
 struct MapScreen: View {
     @EnvironmentObject private var state: AppState
+    @EnvironmentObject private var live: LiveStore
     let focus: Stop?
     @State private var selectedMode = "all"
     @State private var selection: String?
@@ -194,6 +203,13 @@ struct MapScreen: View {
                         .tint(Brand.blue)
                         .tag(stop.id)
                 }
+                ForEach(live.vehicles.filter { selectedMode == "all" || $0.mode == selectedMode }) { vehicle in
+                    Marker("Linija " + vehicle.route,
+                           systemImage: Transport.symbol(vehicle.mode),
+                           coordinate: vehicle.coordinate)
+                        .tint(Brand.teal)
+                        .tag("vehicle:" + vehicle.id)
+                }
             }
             .mapControls { MapCompass() }
             .accessibilityLabel("Karta stanica i terminala")
@@ -207,6 +223,14 @@ struct MapScreen: View {
             if let stop = stops.first(where: { $0.id == selection }) {
                 StopRow(stop: stop, onMap: { focusStop(stop) })
                     .padding(.horizontal, 12)
+            }
+            if let vehicle = live.vehicles.first(where: { selection == "vehicle:" + $0.id }) {
+                Label("Linija " + vehicle.route + " · GPS lokacija", systemImage: "location.fill")
+                    .font(.subheadline.bold()).foregroundStyle(Brand.blue)
+            }
+            if live.vehicles.isEmpty {
+                Text("Praćenje vozila trenutačno nije dostupno.")
+                    .font(.caption).foregroundStyle(.secondary)
             }
             Text("Odaberi stanicu za pregled i spremanje.")
                 .font(.caption).foregroundStyle(.secondary)
@@ -228,18 +252,51 @@ struct MapScreen: View {
 }
 
 struct DeparturesView: View {
+    @EnvironmentObject private var state: AppState
+    @EnvironmentObject private var live: LiveStore
+
     var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Polasci").font(.largeTitle.bold())
-                Label("Polasci trenutačno nisu dostupni.", systemImage: "clock")
-                    .font(.headline)
-                Text("Prije putovanja provjeri red vožnje prijevoznika.")
-                    .foregroundStyle(.secondary)
-                Spacer()
+        let now = Int64(Date().timeIntervalSince1970)
+        let stops = Dictionary(uniqueKeysWithValues: state.cityStops.map { ($0.id, $0.name) })
+        let arrivals = live.arrivals.filter {
+            stops[$0.stopId] != nil && $0.minutes(now: now) != nil
+        }.sorted { ($0.predictedAt ?? $0.scheduledAt ?? Int64.max) <
+                   ($1.predictedAt ?? $1.scheduledAt ?? Int64.max) }
+        return NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 15) {
+                    BrandBar()
+                    Text("Polasci").font(.largeTitle.bold())
+                    Text("Samo provjerene informacije prijevoznika.")
+                        .font(.subheadline).foregroundStyle(.secondary)
+                    if arrivals.isEmpty {
+                        Label("Nema potvrđenih dolazaka.", systemImage: "clock")
+                            .font(.headline)
+                            .padding(17)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 18))
+                        Text("Prije putovanja provjeri službeni red vožnje.")
+                            .font(.subheadline).foregroundStyle(.secondary)
+                    }
+                    ForEach(arrivals) { arrival in
+                        HStack(spacing: 12) {
+                            Image(systemName: Transport.symbol(arrival.mode))
+                                .foregroundStyle(Brand.blue).frame(width: 34)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Linija " + arrival.route).font(.headline)
+                                Text(stops[arrival.stopId] ?? "").font(.caption)
+                                Text(arrival.predicted(now: now) ? "GPS procjena" : "Planirano")
+                                    .font(.caption2).foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Text(String(arrival.minutes(now: now) ?? 0) + " min")
+                                .font(.title3.bold()).foregroundStyle(Brand.blue)
+                        }
+                        .padding(15)
+                        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 18))
+                    }
+                }.padding(18)
             }
-            .padding(22)
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }

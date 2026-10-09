@@ -1,6 +1,8 @@
 package hr.brendigo.kreni
 
 import android.os.Bundle
+import java.time.Instant
+import kotlinx.coroutines.delay
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
@@ -57,10 +59,18 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val catalog = CatalogReader.fromAssets(this)
         val settings = Settings(this, catalog)
+        val liveNetwork = LiveNetwork(LiveCodec.sources(this))
         setContent {
             var prefs by remember { mutableStateOf(settings.read()) }
             var selectedTab by remember { mutableIntStateOf(intent?.getIntExtra("kreni_capture_tab", 0)?.coerceIn(0, 3) ?: 0) }
             var chosenStop by remember { mutableStateOf<Stop?>(null) }
+            var live by remember { mutableStateOf(emptyList<LiveData>()) }
+            LaunchedEffect(prefs.city) {
+                while (true) {
+                    live = liveNetwork.refresh(prefs.city)
+                    delay(30_000)
+                }
+            }
             val city = catalog.cities.firstOrNull { it.id == prefs.city } ?: catalog.cities.first()
             val surface = if (prefs.dark) Navy else Color(0xFFF4F7FC)
             val foreground = if (prefs.dark) Color.White else Navy
@@ -132,11 +142,12 @@ class MainActivity : ComponentActivity() {
                                 catalog.stopsIn(city.id),
                                 chosenStop,
                                 prefs.favorites,
+                                live,
                                 onFavorite = { id ->
                                     apply(prefs.copy(favorites =
                                         if (id in prefs.favorites) prefs.favorites - id else prefs.favorites + id))
                                 })
-                            2 -> DeparturesTab()
+                            2 -> DeparturesTab(city, catalog.stopsIn(city.id), live)
                             else -> MoreTab(
                                 prefs, catalog.stops.filter { it.id in prefs.favorites },
                                 onDark = { apply(prefs.copy(dark = it)) },
@@ -277,11 +288,12 @@ private fun StopCard(stop: Stop, favorite: Boolean, onFavorite: () -> Unit, onOp
 @Composable
 private fun MapTab(
     city: City, stops: List<Stop>, focus: Stop?, favorites: Set<String>,
-    onFavorite: (String) -> Unit
+    live: List<LiveData>, onFavorite: (String) -> Unit
 ) {
     var filter by remember(city.id) { mutableStateOf("all") }
     var selected by remember(city.id, focus?.id) { mutableStateOf(focus) }
     val visible = stops.filter { filter == "all" || filter in it.modes }
+    val vehicles = live.flatMap { it.vehicles }.filter { filter == "all" || it.mode == filter }
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp)) {
             (listOf("all", "bus", "tram", "train", "ferry", "catamaran")
@@ -294,9 +306,13 @@ private fun MapTab(
                 )
             }
         }
+        Text(if (vehicles.isEmpty()) "Praćenje vozila trenutačno nije dostupno"
+             else "GPS vozila: " + vehicles.size,
+             modifier = Modifier.padding(horizontal = 16.dp, vertical = 7.dp),
+             style = MaterialTheme.typography.bodySmall)
         Box(Modifier.weight(1f)) {
             key(city.id, filter, focus?.id) {
-                MapLibreContent(city, visible, focus, Modifier.fillMaxSize())
+                MapLibreContent(city, visible, vehicles, focus, Modifier.fillMaxSize())
             }
             Surface(
                 modifier = Modifier.align(Alignment.TopCenter).padding(12.dp),
@@ -325,7 +341,8 @@ private fun MapTab(
 }
 
 @Composable
-private fun MapLibreContent(city: City, stops: List<Stop>, focus: Stop?, modifier: Modifier) {
+private fun MapLibreContent(city: City, stops: List<Stop>, vehicles: List<Vehicle>,
+    focus: Stop?, modifier: Modifier) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val view = remember(city.id, focus?.id) {
@@ -364,22 +381,63 @@ private fun MapLibreContent(city: City, stops: List<Stop>, focus: Stop?, modifie
             view.onDestroy()
         }
     }
+    LaunchedEffect(view, stops, vehicles) {
+        view.getMapAsync { map ->
+            if (map.style != null) {
+                map.clear()
+                stops.forEach { stop -> map.addMarker(MarkerOptions()
+                    .position(LatLng(stop.lat, stop.lon)).title(stop.name)) }
+                vehicles.forEach { v -> map.addMarker(MarkerOptions()
+                    .position(LatLng(v.lat, v.lon))
+                    .title(modeName(v.mode) + " " + v.route + " · GPS")) }
+            }
+        }
+    }
     AndroidView(factory = { view }, modifier = modifier)
 }
 
 @Composable
-private fun DeparturesTab() {
-    Column(Modifier.fillMaxSize().padding(22.dp)) {
-        Text("Polasci", fontSize = 30.sp, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(14.dp))
-        Card {
-            Row(Modifier.padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Schedule, null, tint = Electric, modifier = Modifier.size(38.dp))
-                Spacer(Modifier.width(14.dp))
-                Column {
-                    Text("Polasci trenutačno nisu dostupni.",
-                        fontWeight = FontWeight.SemiBold)
-                    Text("Prije putovanja provjeri red vožnje prijevoznika.")
+private fun DeparturesTab(city: City, stops: List<Stop>, live: List<LiveData>) {
+    val now = Instant.now().epochSecond
+    val arrivals = live.flatMap { it.arrivals }.filter { arrival ->
+        stops.any { it.id == arrival.stopId } && arrival.minutes(now) != null
+    }.sortedBy { it.predictedAt ?: it.scheduledAt ?: Long.MAX_VALUE }
+    LazyColumn(contentPadding = PaddingValues(18.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        item {
+            Text("Polasci · " + city.name, fontSize = 25.sp, fontWeight = FontWeight.Bold)
+            Text("Samo provjerene informacije prijevoznika.",
+                style = MaterialTheme.typography.bodySmall)
+        }
+        if (arrivals.isEmpty()) item {
+            Card(shape = RoundedCornerShape(20.dp)) {
+                Row(Modifier.padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Schedule, null, tint = Electric,
+                        modifier = Modifier.size(38.dp))
+                    Spacer(Modifier.width(12.dp))
+                    Column {
+                        Text("Nema potvrđenih dolazaka", fontWeight = FontWeight.SemiBold)
+                        Text("Prije putovanja provjeri službeni vozni red.",
+                            style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+            }
+        }
+        items(arrivals, key = { it.id }) { arrival ->
+            Card(shape = RoundedCornerShape(17.dp)) {
+                Row(Modifier.fillMaxWidth().padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Icon(symbol(arrival.mode), null, tint = Electric)
+                    Spacer(Modifier.width(14.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text("Linija " + arrival.route, fontWeight = FontWeight.Bold)
+                        Text(stops.first { it.id == arrival.stopId }.name,
+                            style = MaterialTheme.typography.bodySmall)
+                        Text(if (arrival.estimated(now)) "GPS procjena" else "Planirano",
+                            style = MaterialTheme.typography.labelSmall)
+                    }
+                    Text(arrival.minutes(now).toString() + " min",
+                        fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Electric)
                 }
             }
         }

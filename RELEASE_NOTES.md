@@ -1,16 +1,11 @@
-# KRENI v0.0.3 — Android APK / AAB i iOS
+# KRENI v0.0.4 — praćenje vozila i precizni polasci
 
-KRENI povezuje stanice, kolodvore i jadranske luke u preglednom sučelju.
+- Android i iOS dobili su jednaku infrastrukturu za verificirane GPS lokacije vozila, odabir stanica i vremena dolaska u minutama.
+- Kad prijevoznik dopusti live API, KRENI može prikazati stvarni položaj autobusa, tramvaja ili drugog vozila na karti.
+- GPS informacije starije od 90 sekundi odbacuju se, a procjene se razlikuju od planiranih vremena.
+- Dodani su testovi valjanosti, ograničenje odgovora i sigurno rukovanje mrežnim greškama.
+- Nema vlastite baze podataka i nema lažnih GPS simulacija.
 
-### Poboljšano
-- Instalacijski APK za Android, potpisan testnim certifikatom i provjeren na emulatoru.
-- Odvojeni Android App Bundle (AAB) uz mogućnost sigurnog produkcijskog potpisivanja.
-- iOS aplikacijska ikona i početni zaslon u stilu KRENI brenda.
-- iOS simulator aplikacija, uređajska arhiva (xcarchive), nepotpisani IPA i izvorni projekt.
-- Stvarne Android/iOS snimke iz automatiziranih pokretanja, umjesto dizajnerskih prikaza.
-- Novi GitHub workflow za provjere paketa prije objave.
+**Trenutačno nijedan službeni produkcijski live feed nije aktiviran.** ZET-ov dostupni GTFS-RT download označen je samo za testiranje, a dozvole za druge prijevoznike tek treba potvrditi. Dolasci u minutama pojavljuju se isključivo kad se validirani izvori priključe.
 
-### Važne informacije
-Android paket *installable-test.apk* predviđen je za isprobavanje, a ne za Google Play. AAB koji nije produkcijski potpisan potrebno je potpisati trajnim ključem. iOS nepotpisani IPA nije moguće instalirati na obični iPhone bez valjanih Apple certifikata.
-
-Prikazane lokacije su orijentacijske. Službeni polasci i GPS podaci nisu aktivni. KRENI ne koristi vlastitu bazu podataka.
+Izdanje uključuje testno potpisani Android APK, Android AAB bez produkcijskog potpisa, iOS simulator, nepotpisani IPA, XCArchive i zasebne izvorne projekte. Distribucijski certifikati potrebni su za Google Play / App Store.

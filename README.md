@@ -76,6 +76,14 @@ Snimke su nastale instalacijom i pokretanjem aplikacija u Android emulatoru i iO
 
 Brendiranje, sadržaj kartica i navigacija razvijaju se usporedno, uz prilagodbu standardima Androida i iOS-a.
 
+## Praćenje vozila i dolasci
+
+KRENI ima pripremljen zajednički sustav za stvarne GPS lokacije i dolaske u minutama te prikaz vozila na karti. Prikazuju se isključivo podaci prijevoznika koji su provjereni i dopušteni za produkciju.
+
+**Trenutačno nijedan operater nema uključen provjeren produkcijski live feed.** Aplikacija jasno prikazuje nedostupnost podataka, bez simuliranih autobusa, nagađanja dolazaka ili prikazivanja GPS pozicija starijih od 90 sekundi. ZET-ov javni portal za GTFS-RT u ovom je trenutku označen kao *samo za testiranje*.
+
+Android i iOS imaju isti format podataka i iste kontrole valjanosti. [Podatkovni format, izvori i uvjeti za aktivaciju](docs/LIVE_DATA.md).
+
 ## Pouzdani podaci, bez nagađanja
 
 [GTFS procesor](pipeline/gtfs.py) provjerava identifikatore, prometne kalendare, vremenske zone i presjedanja. Integracije se ne uključuju bez pouzdanog izvora i dopuštenja za korištenje.

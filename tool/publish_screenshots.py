@@ -18,7 +18,11 @@ file = Path("README.md")
 readme = file.read_text(encoding="utf-8")
 marker = "<!-- KRENI_REAL_SCREENSHOTS -->"
 if marker not in readme:
-    raise SystemExit("README screenshot marker not found")
+    start = readme.find("### Stvarni zasloni aplikacije")
+    end = readme.find("## Preuzmi aplikaciju", start)
+    if start < 0 or end < 0:
+        raise SystemExit("Expected README screenshot section not found")
+    readme = readme[:start] + marker + "\n\n" + readme[end:]
 lines = [
     "### Stvarni zasloni aplikacije", "",
     "Snimke su nastale instalacijom i pokretanjem aplikacija u Android emulatoru i iOS simulatoru; nisu ilustracije.", ""
