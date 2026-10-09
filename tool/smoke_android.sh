@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
-APK="dist/android/KRENI-Android-v0.0.3-installable-test.apk"
+APK="$(find dist/android -maxdepth 1 -type f -name 'KRENI-Android-v*-installable-test.apk' -print -quit)"
+test -n "$APK"
+echo "Installing package: $APK"
 test -s "$APK"
 adb install -r "$APK"
 mkdir -p dist/screenshots/android
