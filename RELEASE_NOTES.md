@@ -1,11 +1,15 @@
-# KRENI v0.0.4 — praćenje vozila i precizni polasci
+# KRENI v0.0.5 — pouzdanije praćenje vozila
 
-- Android i iOS dobili su jednaku infrastrukturu za verificirane GPS lokacije vozila, odabir stanica i vremena dolaska u minutama.
-- Kad prijevoznik dopusti live API, KRENI može prikazati stvarni položaj autobusa, tramvaja ili drugog vozila na karti.
-- GPS informacije starije od 90 sekundi odbacuju se, a procjene se razlikuju od planiranih vremena.
-- Dodani su testovi valjanosti, ograničenje odgovora i sigurno rukovanje mrežnim greškama.
-- Nema vlastite baze podataka i nema lažnih GPS simulacija.
+Ovo izdanje poboljšava stabilnost i sigurnost infrastrukture za vozila i dolaske na Androidu i iOS-u.
 
-**Trenutačno nijedan službeni produkcijski live feed nije aktiviran.** ZET-ov dostupni GTFS-RT download označen je samo za testiranje, a dozvole za druge prijevoznike tek treba potvrditi. Dolasci u minutama pojavljuju se isključivo kad se validirani izvori priključe.
+- GPS lokacije i procjene dolaska automatski se uklanjaju 90 sekundi nakon zadnjeg valjanog ažuriranja, čak i kada mreža nije dostupna.
+- Prikaz se osvježava svakih 10 sekundi; mrežni podaci se dohvaćaju odobrenim izvorima svakih 30 sekundi.
+- Spriječeno je zadržavanje podataka iz prethodnog grada nakon promjene lokacije.
+- Ispravljena je obrada otkazivanja mrežnih zahtjeva te ekstremnih vremenskih oznaka.
+- Jasno se razlikuju „Procjena prijevoznika”, „Planirani polazak” i vrijeme posljednjeg ažuriranja.
+- Live izvor mora imati izričito produkcijsko odobrenje i HTTPS poveznicu na uvjete korištenja prije uključivanja.
+- Dodani su Android i iOS testovi sigurnosti podataka te provjere izvora.
 
-Izdanje uključuje testno potpisani Android APK, Android AAB bez produkcijskog potpisa, iOS simulator, nepotpisani IPA, XCArchive i zasebne izvorne projekte. Distribucijski certifikati potrebni su za Google Play / App Store.
+**Produkcijski live feedovi nisu uključeni.** Ne prikazuju se izmišljeni dolasci, autobusi ili brodovi. Prije aktivacije potreban je provjeren službeni izvor i dopuštenje operatera.
+
+Distribucija uključuje testno potpisani Android APK, AAB i iOS arhive/izvore. Za Google Play i iPhone potrebni su trajni produkcijski certifikati; nepotpisani IPA nije instalacijski paket.

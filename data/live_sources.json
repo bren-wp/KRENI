@@ -6,37 +6,49 @@
       "id": "zet",
       "city": "zagreb",
       "enabled": false,
-      "endpoint": null
+      "endpoint": null,
+      "approvedForProduction": false,
+      "licenseUrl": null
     },
     {
       "id": "autotrolej",
       "city": "rijeka",
       "enabled": false,
-      "endpoint": null
+      "endpoint": null,
+      "approvedForProduction": false,
+      "licenseUrl": null
     },
     {
       "id": "promet-split",
       "city": "split",
       "enabled": false,
-      "endpoint": null
+      "endpoint": null,
+      "approvedForProduction": false,
+      "licenseUrl": null
     },
     {
       "id": "gpp",
       "city": "osijek",
       "enabled": false,
-      "endpoint": null
+      "endpoint": null,
+      "approvedForProduction": false,
+      "licenseUrl": null
     },
     {
       "id": "hzpp",
       "city": "zagreb",
       "enabled": false,
-      "endpoint": null
+      "endpoint": null,
+      "approvedForProduction": false,
+      "licenseUrl": null
     },
     {
       "id": "jadrolinija",
       "city": "split",
       "enabled": false,
-      "endpoint": null
+      "endpoint": null,
+      "approvedForProduction": false,
+      "licenseUrl": null
     }
   ]
 }

@@ -65,13 +65,24 @@ class MainActivity : ComponentActivity() {
             var selectedTab by remember { mutableIntStateOf(intent?.getIntExtra("kreni_capture_tab", 0)?.coerceIn(0, 3) ?: 0) }
             var chosenStop by remember { mutableStateOf<Stop?>(null) }
             var live by remember { mutableStateOf(emptyList<LiveData>()) }
-            LaunchedEffect(prefs.city) {
+            var clock by remember { mutableLongStateOf(Instant.now().epochSecond) }
+            LaunchedEffect(Unit) {
                 while (true) {
-                    live = liveNetwork.refresh(prefs.city)
+                    delay(10_000)
+                    clock = Instant.now().epochSecond
+                }
+            }
+            LaunchedEffect(prefs.city) {
+                live = emptyList()
+                val requestedCity = prefs.city
+                while (true) {
+                    live = liveNetwork.refresh(requestedCity)
                     delay(30_000)
                 }
             }
             val city = catalog.cities.firstOrNull { it.id == prefs.city } ?: catalog.cities.first()
+            val currentLive = live.filter { it.freshFor(city.id, clock) }
+                .map { it.filtered(clock) }
             val surface = if (prefs.dark) Navy else Color(0xFFF4F7FC)
             val foreground = if (prefs.dark) Color.White else Navy
 
@@ -142,12 +153,13 @@ class MainActivity : ComponentActivity() {
                                 catalog.stopsIn(city.id),
                                 chosenStop,
                                 prefs.favorites,
-                                live,
+                                currentLive,
+                                clock,
                                 onFavorite = { id ->
                                     apply(prefs.copy(favorites =
                                         if (id in prefs.favorites) prefs.favorites - id else prefs.favorites + id))
                                 })
-                            2 -> DeparturesTab(city, catalog.stopsIn(city.id), live)
+                            2 -> DeparturesTab(city, catalog.stopsIn(city.id), currentLive, clock)
                             else -> MoreTab(
                                 prefs, catalog.stops.filter { it.id in prefs.favorites },
                                 onDark = { apply(prefs.copy(dark = it)) },
@@ -288,7 +300,7 @@ private fun StopCard(stop: Stop, favorite: Boolean, onFavorite: () -> Unit, onOp
 @Composable
 private fun MapTab(
     city: City, stops: List<Stop>, focus: Stop?, favorites: Set<String>,
-    live: List<LiveData>, onFavorite: (String) -> Unit
+    live: List<LiveData>, clock: Long, onFavorite: (String) -> Unit
 ) {
     var filter by remember(city.id) { mutableStateOf("all") }
     var selected by remember(city.id, focus?.id) { mutableStateOf(focus) }
@@ -306,8 +318,10 @@ private fun MapTab(
                 )
             }
         }
+        val updated = live.maxOfOrNull { it.generatedAt }
         Text(if (vehicles.isEmpty()) "Praćenje vozila trenutačno nije dostupno"
-             else "GPS vozila: " + vehicles.size,
+             else "GPS vozila: " + vehicles.size +
+                 " · osvježeno prije " + (clock - (updated ?: clock)).coerceAtLeast(0) + " s",
              modifier = Modifier.padding(horizontal = 16.dp, vertical = 7.dp),
              style = MaterialTheme.typography.bodySmall)
         Box(Modifier.weight(1f)) {
@@ -359,6 +373,11 @@ private fun MapLibreContent(city: City, stops: List<Stop>, vehicles: List<Vehicl
                         map.addMarker(MarkerOptions()
                             .position(LatLng(stop.lat, stop.lon)).title(stop.name))
                     }
+                    vehicles.forEach { v ->
+                        map.addMarker(MarkerOptions()
+                            .position(LatLng(v.lat, v.lon))
+                            .title(modeName(v.mode) + " " + v.route + " · GPS"))
+                    }
                 }
             }
         }
@@ -397,8 +416,8 @@ private fun MapLibreContent(city: City, stops: List<Stop>, vehicles: List<Vehicl
 }
 
 @Composable
-private fun DeparturesTab(city: City, stops: List<Stop>, live: List<LiveData>) {
-    val now = Instant.now().epochSecond
+private fun DeparturesTab(city: City, stops: List<Stop>, live: List<LiveData>,
+    now: Long) {
     val arrivals = live.flatMap { it.arrivals }.filter { arrival ->
         stops.any { it.id == arrival.stopId } && arrival.minutes(now) != null
     }.sortedBy { it.predictedAt ?: it.scheduledAt ?: Long.MAX_VALUE }
@@ -423,7 +442,7 @@ private fun DeparturesTab(city: City, stops: List<Stop>, live: List<LiveData>) {
                 }
             }
         }
-        items(arrivals, key = { it.id }) { arrival ->
+        items(arrivals, key = { it.provider + ":" + it.id }) { arrival ->
             Card(shape = RoundedCornerShape(17.dp)) {
                 Row(Modifier.fillMaxWidth().padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically) {
@@ -433,7 +452,10 @@ private fun DeparturesTab(city: City, stops: List<Stop>, live: List<LiveData>) {
                         Text("Linija " + arrival.route, fontWeight = FontWeight.Bold)
                         Text(stops.first { it.id == arrival.stopId }.name,
                             style = MaterialTheme.typography.bodySmall)
-                        Text(if (arrival.estimated(now)) "GPS procjena" else "Planirano",
+                        Text(if (arrival.estimated(now)) "Procjena prijevoznika"
+                             else "Planirani polazak",
+                            style = MaterialTheme.typography.labelSmall)
+                        Text("Ažurirano prije " + (now - arrival.updatedAt).coerceAtLeast(0) + " s",
                             style = MaterialTheme.typography.labelSmall)
                     }
                     Text(arrival.minutes(now).toString() + " min",

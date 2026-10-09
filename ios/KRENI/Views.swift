@@ -38,10 +38,21 @@ struct RootView: View {
             .tabItem { Label("Više", systemImage: "person.fill") }.tag(3)
         }
         .environmentObject(live)
-        .task(id: state.selectedCity) {
+        .task {
             while !Task.isCancelled {
-                await live.refresh(city: state.selectedCity)
-                try? await Task.sleep(nanoseconds: 30_000_000_000)
+                live.tick()
+                do {
+                    try await Task.sleep(nanoseconds: 10_000_000_000)
+                } catch { break }
+            }
+        }
+        .task(id: state.selectedCity) {
+            let city = state.selectedCity
+            while !Task.isCancelled {
+                await live.refresh(city: city)
+                do {
+                    try await Task.sleep(nanoseconds: 30_000_000_000)
+                } catch { break }
             }
         }
     }
@@ -203,7 +214,7 @@ struct MapScreen: View {
                         .tint(Brand.blue)
                         .tag(stop.id)
                 }
-                ForEach(live.vehicles.filter { selectedMode == "all" || $0.mode == selectedMode }) { vehicle in
+                ForEach(live.vehicles(in: state.selectedCity).filter { selectedMode == "all" || $0.mode == selectedMode }) { vehicle in
                     Marker("Linija " + vehicle.route,
                            systemImage: Transport.symbol(vehicle.mode),
                            coordinate: vehicle.coordinate)
@@ -224,13 +235,17 @@ struct MapScreen: View {
                 StopRow(stop: stop, onMap: { focusStop(stop) })
                     .padding(.horizontal, 12)
             }
-            if let vehicle = live.vehicles.first(where: { selection == "vehicle:" + $0.id }) {
+            if let vehicle = live.vehicles(in: state.selectedCity).first(where: { selection == "vehicle:" + $0.id }) {
                 Label("Linija " + vehicle.route + " · GPS lokacija", systemImage: "location.fill")
                     .font(.subheadline.bold()).foregroundStyle(Brand.blue)
             }
-            if live.vehicles.isEmpty {
+            if live.vehicles(in: state.selectedCity).isEmpty {
                 Text("Praćenje vozila trenutačno nije dostupno.")
                     .font(.caption).foregroundStyle(.secondary)
+            } else {
+                Label("GPS vozila: " + String(live.vehicles(in: state.selectedCity).count),
+                      systemImage: "location.fill")
+                    .font(.caption).foregroundStyle(Brand.blue)
             }
             Text("Odaberi stanicu za pregled i spremanje.")
                 .font(.caption).foregroundStyle(.secondary)
@@ -258,7 +273,7 @@ struct DeparturesView: View {
     var body: some View {
         let now = Int64(Date().timeIntervalSince1970)
         let stops = Dictionary(uniqueKeysWithValues: state.cityStops.map { ($0.id, $0.name) })
-        let arrivals = live.arrivals.filter {
+        let arrivals = live.arrivals(in: state.selectedCity).filter {
             stops[$0.stopId] != nil && $0.minutes(now: now) != nil
         }.sorted { ($0.predictedAt ?? $0.scheduledAt ?? Int64.max) <
                    ($1.predictedAt ?? $1.scheduledAt ?? Int64.max) }
@@ -285,7 +300,9 @@ struct DeparturesView: View {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("Linija " + arrival.route).font(.headline)
                                 Text(stops[arrival.stopId] ?? "").font(.caption)
-                                Text(arrival.predicted(now: now) ? "GPS procjena" : "Planirano")
+                                Text(arrival.predicted(now: now) ? "Procjena prijevoznika" : "Planirano")
+                                    .font(.caption2).foregroundStyle(.secondary)
+                                Text("Ažurirano prije " + String(max(0, now - arrival.updatedAt)) + " s")
                                     .font(.caption2).foregroundStyle(.secondary)
                             }
                             Spacer()

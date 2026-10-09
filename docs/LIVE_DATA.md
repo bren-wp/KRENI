@@ -29,3 +29,11 @@ Aplikacije osvježavaju podatke svakih 30 sekundi, odbacuju položaje i procjene
 Zabranjene su neprovjerene API adrese, lažne GPS lokacije i uporaba testnog feeda kao produkcijskog. Prije aktivacije obavezna je provjera dostupnosti, licencije, static/RT GTFS ID mapiranja i opterećenja pružatelja.
 
 Preporuka za svježinu podataka: https://github.com/google/transit/blob/master/gtfs-realtime/best-practices/best-practices.md
+
+## Kontrola produkcijskih izvora (v0.0.5)
+
+Konfiguracija `data/live_sources.json` mora sadržavati zasebne oznake `enabled`, `approvedForProduction`, `licenseUrl` i `endpoint`. Aplikacije neće uspostaviti mrežnu vezu s izvorom bez izričite aktivacije, potvrde produkcijske dozvole, javne HTTPS poveznice na uvjete korištenja i HTTPS adrese feeda. Sama oznaka nije pravna provjera: potrebna je neovisna potvrda s prijevoznikom.
+
+Polasci i GPS pozicije brišu se iz prikaza nakon 90 sekundi bez svježeg podatka, čak i ako mreža prestane raditi nakon posljednjeg uspješnog zahtjeva. Promjena grada ne smije prikazati podatke iz prethodnog grada. Vremenski podaci na ekranu osvježavaju se svakih 10 sekundi.
+
+CI validira konfiguraciju izvora i provodi Android JVM i iOS XCTest testove, uključujući rubne slučajeve s neispravnim vremenskim oznakama i izostalim odobrenjem za produkciju.

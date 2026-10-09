@@ -15,6 +15,40 @@ class LiveTransitTest {
     fun staleFeedIsRejected() { LiveCodec.parse(json,"zagreb","zet",100091) }
     @Test(expected=IllegalArgumentException::class)
     fun mismatchedCityIsRejected() { LiveCodec.parse(json,"rijeka","zet",100000) }
+    @Test fun hostileExtremeTimestampsAreNotFresh() {
+        val expired = Arrival("a", "zet:1", "6", "tram", 100120, 100121,
+            Long.MIN_VALUE, "zet")
+        assertNull(expired.minutes(100000))
+        val feed = LiveData("zagreb", "zet", Long.MIN_VALUE, emptyList(), emptyList())
+        assertFalse(feed.freshFor("zagreb", 100000))
+    }
+    @Test fun expiredArrivalCannotKeepShowingMinutes() {
+        val data = LiveCodec.parse(json,"zagreb","zet",100000)
+        val arrival = data.arrivals.single()
+        assertEquals(3, arrival.minutes(100000))
+        assertNull(arrival.minutes(100091))
+        assertTrue(data.freshFor("zagreb",100090))
+        assertFalse(data.freshFor("zagreb",100091))
+        assertFalse(data.freshFor("rijeka",100000))
+        assertTrue(data.filtered(100091).vehicles.isEmpty())
+        assertTrue(data.filtered(100091).arrivals.isEmpty())
+    }
+    @Test fun missingProductionApprovalDisablesValidHttpsSource() {
+        val data = LiveCodec.providers("""{"schemaVersion":1,"providers":[{"id":"zet",
+        "city":"zagreb","enabled":true,"endpoint":"https://example.org/rt.json"}]}""")
+        assertFalse(data.single().enabled)
+    }
+    @Test fun productionApprovalRequiresExplicitLicenseUrl() {
+        val data = LiveCodec.providers("""{"schemaVersion":1,"providers":[{"id":"zet",
+        "city":"zagreb","enabled":true,"approvedForProduction":true,
+        "endpoint":"https://example.org/rt.json"}]}""")
+        assertFalse(data.single().enabled)
+    }
+    @Test fun hostileEndpointIsDisabled() {
+        val data = LiveCodec.providers("""{"schemaVersion":1,"providers":[{"id":"zet",
+        "city":"zagreb","enabled":true,"endpoint":"https://user@example.com"}]}""")
+        assertFalse(data.single().enabled)
+    }
     @Test fun nonHttpsIsDisabled() {
         val data = LiveCodec.providers("""{"schemaVersion":1,"providers":[{"id":"zet",
         "city":"zagreb","enabled":true,"endpoint":"http://example.com"}]}""")
