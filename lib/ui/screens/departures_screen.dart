@@ -74,8 +74,10 @@ class _DeparturesScreenState extends State<DeparturesScreen> {
           final results = (snapshot.data ?? [])
             .where((d) => ids.contains(d.stopId) && d.time.isAfter(DateTime.now()))
             .toList();
-          if (results.isEmpty) return const Card(child: Padding(
-            padding: EdgeInsets.all(20), child: Text('Za odabrani grad nema potvrđenih budućih polazaka.')));
+          if (results.isEmpty) {
+            return const Card(child: Padding(
+              padding: EdgeInsets.all(20), child: Text('Za odabrani grad nema potvrđenih budućih polazaka.')));
+          }
           return Column(children: [
             for (final departure in results)
               Card(child: ListTile(

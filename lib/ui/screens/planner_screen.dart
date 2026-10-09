@@ -27,9 +27,10 @@ class _PlannerScreenState extends State<PlannerScreen> {
         const Text('Odaberi polazište i odredište. Za potvrđene veze potreban je službeni vozni red.'),
         const SizedBox(height: 22),
         DropdownButtonFormField<StopPoint>(
+          key: ValueKey('origin-' + (origin?.id ?? 'none')),
           isExpanded: true,
           decoration: const InputDecoration(labelText: 'Odakle?'),
-          value: origin,
+          initialValue: origin,
           items: [
             for (final stop in StopCatalog.stops)
               DropdownMenuItem(value: stop,
@@ -50,9 +51,10 @@ class _PlannerScreenState extends State<PlannerScreen> {
           icon: const Icon(Icons.swap_vert_rounded),
         ),
         DropdownButtonFormField<StopPoint>(
+          key: ValueKey('destination-' + (destination?.id ?? 'none')),
           isExpanded: true,
           decoration: const InputDecoration(labelText: 'Kamo?'),
-          value: destination,
+          initialValue: destination,
           items: [
             for (final stop in StopCatalog.stops)
               DropdownMenuItem(value: stop,
@@ -82,7 +84,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
               const Text('Provjerite stvarni polazak kod prijevoznika.',
                 style: TextStyle(fontWeight: FontWeight.w700)),
             ]),
-          ))),
+          )),
         ],
       ]),
     );
