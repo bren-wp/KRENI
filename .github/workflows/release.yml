@@ -43,7 +43,7 @@ jobs:
         with:
           channel: stable
           cache: true
-      - run: flutter create --org hr.brendigo --project-name kreni --platforms android .
+      - run: flutter create --org hr.brendigo --project-name kreni --platforms android,ios .
       - run: flutter pub get
       - run: python3 tool/generate_icon.py
       - run: dart run flutter_launcher_icons
@@ -69,7 +69,7 @@ jobs:
         with:
           channel: stable
           cache: true
-      - run: flutter create --org hr.brendigo --project-name kreni --platforms ios .
+      - run: flutter create --org hr.brendigo --project-name kreni --platforms android,ios .
       - run: flutter pub get
       - run: python3 tool/generate_icon.py
       - run: dart run flutter_launcher_icons
