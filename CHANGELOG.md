@@ -4,7 +4,7 @@
 
 ### Dodano
 - Flutter projekt za Android i iOS
-- Jedinstveni KRENI SVG identitet, marketinški README i koncepti ekrana
+- Jedinstveni KRENI SVG identitet, automatski generirane ikone/splash, marketinški README i koncepti ekrana
 - Početna stranica, gradovi, katalog informativnih lokacija i favoriti
 - OpenStreetMap karta i filtri po vrsti prijevoza
 - Osnovni planer s orijentacijskom zračnom udaljenošću

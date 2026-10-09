@@ -39,6 +39,7 @@ Trenutačno je riječ o **razvojnoj verziji v0.0.1**. Aplikacija prikazuje infor
 - **Polasci** — siguran HTTPS/JSON adapter spreman za integraciju dozvoljenih izvora; bez izmišljanja vremena.
 - **Privatnost** — bez korisničkog računa, analitike, vlastite baze podataka, Firebasea ili Supabasea.
 - **Izgled** — svijetla i tamna tema, prilagođeno manjim i većim zaslonima.
+- **Identitet** — prilagođena KRENI Android/iOS ikonica i splash ekran generirani iz izvornog SVG dizajna tijekom builda.
 
 ## 🌊 Hrvatska povezana kopnom i morem
 

@@ -25,6 +25,7 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
+      - run: python3 tool/generate_icon.py
       - run: flutter analyze --no-fatal-infos
       - run: flutter test
 
@@ -44,6 +45,9 @@ jobs:
           cache: true
       - run: flutter create --org hr.brendigo --project-name kreni --platforms android .
       - run: flutter pub get
+      - run: python3 tool/generate_icon.py
+      - run: dart run flutter_launcher_icons
+      - run: dart run flutter_native_splash:create
       - run: flutter build apk --release
       - run: |
           mkdir -p dist
@@ -67,6 +71,9 @@ jobs:
           cache: true
       - run: flutter create --org hr.brendigo --project-name kreni --platforms ios .
       - run: flutter pub get
+      - run: python3 tool/generate_icon.py
+      - run: dart run flutter_launcher_icons
+      - run: dart run flutter_native_splash:create
       - run: flutter build ios --release --no-codesign
       - run: |
           mkdir -p dist
