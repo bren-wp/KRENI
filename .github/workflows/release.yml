@@ -1,0 +1,117 @@
+name: KRENI · Android / iOS / Release
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kreni-release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Flutter Analyze & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze --no-fatal-infos
+      - run: flutter test
+
+  android:
+    name: Android release APK
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter create --org hr.brendigo --project-name kreni --platforms android .
+      - run: flutter pub get
+      - run: flutter build apk --release
+      - run: |
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-release.apk dist/KRENI-Android-v0.0.1.apk
+          test -s dist/KRENI-Android-v0.0.1.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kreni-android
+          path: dist/KRENI-Android-v0.0.1.apk
+          if-no-files-found: error
+
+  ios:
+    name: iOS unsigned build
+    needs: quality
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter create --org hr.brendigo --project-name kreni --platforms ios .
+      - run: flutter pub get
+      - run: flutter build ios --release --no-codesign
+      - run: |
+          mkdir -p dist
+          test -d build/ios/iphoneos/Runner.app
+          ditto -c -k --keepParent build/ios/iphoneos/Runner.app dist/KRENI-iOS-unsigned-v0.0.1.zip
+          test -s dist/KRENI-iOS-unsigned-v0.0.1.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kreni-ios-unsigned
+          path: dist/KRENI-iOS-unsigned-v0.0.1.zip
+          if-no-files-found: error
+
+  publish:
+    name: Publish v0.0.1 pre-release
+    needs: [quality, android, ios]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: kreni-android
+          path: dist/android
+      - uses: actions/download-artifact@v4
+        with:
+          name: kreni-ios-unsigned
+          path: dist/ios
+      - name: Verify artifacts
+        run: |
+          test -s dist/android/KRENI-Android-v0.0.1.apk
+          test -s dist/ios/KRENI-iOS-unsigned-v0.0.1.zip
+      - name: Create pre-release if not already published
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view v0.0.1 >/dev/null 2>&1; then
+            echo "v0.0.1 already exists; skipping immutable release."
+          else
+            gh release create v0.0.1 \
+              --target "$GITHUB_SHA" \
+              --title "KRENI v0.0.1 — prvi razvojni pre-release" \
+              --notes-file RELEASE_NOTES.md \
+              --prerelease \
+              dist/android/KRENI-Android-v0.0.1.apk \
+              dist/ios/KRENI-iOS-unsigned-v0.0.1.zip
+          fi

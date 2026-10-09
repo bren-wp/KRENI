@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="850" viewBox="0 0 480 850">
+<rect width="480" height="850" rx="38" fill="#F5F8FC"/><rect x="0" y="0" width="480" height="256" rx="38" fill="#071936"/>
+<text x="40" y="65" font-family="Arial,sans-serif" fill="#02CDBD" font-size="26" font-weight="900">KRENI</text>
+<text x="40" y="146" font-family="Arial,sans-serif" fill="#FFFFFF" font-weight="800" font-size="46">Početna</text>
+<text x="40" y="193" font-family="Arial,sans-serif" fill="#BED5F5" font-size="23">Krenimo zajedno.</text>
+<rect x="34" y="277" width="412" height="352" rx="29" fill="#FFFFFF" stroke="#E3EBF6"/>
+<rect x="55" y="300" width="365" height="72" rx="18" fill="#E9F0FA"/><text x="78" y="345" font-family="Arial,sans-serif" font-size="22" fill="#071936">Odakle?</text><rect x="55" y="394" width="365" height="72" rx="18" fill="#E9F0FA"/><text x="78" y="439" font-family="Arial,sans-serif" font-size="22" fill="#071936">Kamo?</text><rect x="55" y="488" width="365" height="72" rx="18" fill="#146BFC"/><text x="78" y="533" font-family="Arial,sans-serif" font-size="22" fill="#FFFFFF">Planiraj put</text>
+<text x="35" y="697" font-family="Arial,sans-serif" font-size="18" fill="#425776">Zagreb · Stanice i terminali</text>
+<rect y="761" width="480" height="89" rx="26" fill="#071936"/>
+<text x="36" y="815" font-family="Arial,sans-serif" font-size="19" fill="#AFC6E8">Početna     Karta     Polasci     Više</text>
+</svg>

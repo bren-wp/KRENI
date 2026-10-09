@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="740" height="160" viewBox="0 0 740 160">
+<rect width="740" height="160" rx="24" fill="#071936"/>
+<g transform="translate(20 17) scale(.246)"><rect width="512" height="512" rx="112" fill="#0A2E60"/><path d="M146 105 L146 348 Q146 393 105 419 M146 282 L326 124 M164 272 L362 407" fill="none" stroke="#00CDBD" stroke-width="67" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146" cy="105" r="38" fill="#fff"/><circle cx="146" cy="348" r="38" fill="#fff"/><circle cx="238" cy="210" r="38" fill="#fff"/></g>
+<text x="167" y="93" fill="#fff" font-size="79" font-weight="800" font-family="Arial, sans-serif" letter-spacing="-3">KRENI</text>
+<circle cx="402" cy="32" r="8" fill="#02CDBD"/>
+<text x="170" y="125" fill="#B4CBE9" font-size="22" font-family="Arial, sans-serif" letter-spacing="1.5">Javni prijevoz Hrvatske</text>
+</svg>

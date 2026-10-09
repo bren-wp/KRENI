@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="520" viewBox="0 0 1280 520">
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#071936"/><stop offset="1" stop-color="#10448E"/></linearGradient><linearGradient id="line"><stop stop-color="#146BFC"/><stop offset="1" stop-color="#02CDBD"/></linearGradient></defs>
+<rect width="1280" height="520" rx="30" fill="url(#bg)"/>
+<path d="M25 392 Q200 200 330 349 T655 267 T1023 285 T1280 145" fill="none" stroke="url(#line)" stroke-width="15" stroke-linecap="round" opacity=".5"/>
+<g fill="#fff"><circle cx="160" cy="292" r="14"/><circle cx="530" cy="296" r="14"/><circle cx="911" cy="298" r="14"/></g>
+<text x="65" y="100" font-size="68" font-family="Arial, sans-serif" fill="#fff" font-weight="900">KRENI</text>
+<text x="65" y="150" font-size="30" font-family="Arial, sans-serif" fill="#DDEFFF">Cijela Hrvatska. Jedno putovanje.</text>
+<text x="65" y="196" font-size="20" font-family="Arial, sans-serif" fill="#C4D8F8">Autobusi  •  Tramvaji  •  Vlakovi  •  Trajekti  •  Katamarani</text>
+<rect x="60" y="234" width="420" height="79" rx="20" fill="#fff" opacity=".12"/><text x="84" y="279" font-size="22" font-family="Arial, sans-serif" fill="#fff">Android + iOS  ·  bez vlastite baze</text>
+<g transform="translate(895 47)"><rect width="294" height="431" rx="40" fill="#030D22" stroke="#77B1F7" stroke-width="5"/><rect x="13" y="14" width="268" height="403" rx="31" fill="#F5F8FC"/><rect x="13" y="14" width="268" height="148" rx="31" fill="#071936"/><text x="35" y="59" fill="#fff" font-size="27" font-weight="900" font-family="Arial">KRENI</text><text x="35" y="102" fill="#fff" font-size="19" font-family="Arial">Krenimo zajedno.</text><rect x="31" y="182" width="232" height="58" rx="14" fill="#E7EFFA"/><text x="48" y="217" font-size="18" fill="#071936" font-family="Arial">Odakle?</text><rect x="31" y="251" width="232" height="58" rx="14" fill="#E7EFFA"/><text x="48" y="286" font-size="18" fill="#071936" font-family="Arial">Kamo?</text><rect x="31" y="324" width="232" height="57" rx="16" fill="#146BFC"/><text x="80" y="359" font-size="18" font-weight="bold" fill="#fff" font-family="Arial">Planiraj put</text></g>
+</svg>
