@@ -31,7 +31,28 @@ Projekt je osmišljen za autobuse, tramvaje Zagreba i Osijeka, vlakove, trajekte
 | 🚉 Više načina prijevoza | 🌙 Dvije teme | 🔐 Privatnost |
 | Autobusi, tramvaji, vlakovi i brodovi | Svijetli i tamni izgled | Bez računa i vlastite baze podataka |
 
-<!-- KRENI_REAL_SCREENSHOTS -->
+### Stvarni zasloni aplikacije
+
+Snimke su nastale instalacijom i pokretanjem aplikacija u Android emulatoru i iOS simulatoru; nisu ilustracije.
+
+**ANDROID**
+
+<div align="center">
+<img src="docs/screenshots/android/home.png" alt="KRENI android — Početna, stvarna snimka zaslona" width="185" />
+<img src="docs/screenshots/android/map.png" alt="KRENI android — Karta, stvarna snimka zaslona" width="185" />
+<img src="docs/screenshots/android/departures.png" alt="KRENI android — Polasci, stvarna snimka zaslona" width="185" />
+<img src="docs/screenshots/android/more.png" alt="KRENI android — Postavke, stvarna snimka zaslona" width="185" />
+</div>
+
+**IOS**
+
+<div align="center">
+<img src="docs/screenshots/ios/home.png" alt="KRENI ios — Početna, stvarna snimka zaslona" width="185" />
+<img src="docs/screenshots/ios/map.png" alt="KRENI ios — Karta, stvarna snimka zaslona" width="185" />
+<img src="docs/screenshots/ios/departures.png" alt="KRENI ios — Polasci, stvarna snimka zaslona" width="185" />
+<img src="docs/screenshots/ios/more.png" alt="KRENI ios — Postavke, stvarna snimka zaslona" width="185" />
+</div>
+
 
 ## Preuzmi aplikaciju
 
