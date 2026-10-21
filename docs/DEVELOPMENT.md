@@ -1,29 +1,27 @@
-# Razvoj i izdavanje KRENI
+# KRENI — nativni Android razvoj
 
-## Lokalni razvoj
+Projekt sadrži samo Android (Kotlin, Jetpack Compose, MapLibre). Flutter i iOS ne koriste se.
+
+## Lokalno
+
+Android SDK API 36, JDK 17, Gradle 8.14.3:
 
 ```bash
-flutter create --project-name kreni --org hr.brendigo --platforms android,ios .
-flutter pub get
-flutter analyze
-flutter test
-flutter run
+cd android
+gradle :app:testDebugUnitTest :app:assembleDebug :app:bundleRelease
 ```
 
-Bez vlastite baze podataka ili backend konfiguracije.
+## CI
 
-## GitHub Actions
+Workflow .github/workflows/platform-release.yml radi validaciju podataka, Android unit testove, APK/AAB,
+test instalacije i pokretanja u Android emulatoru. Na main grani nakon uspjeha objavljuje Android pre-release.
 
-`release.yml` izvršava analizu i testove na Linuxu, Android release APK build na Linuxu i nepotpisani iOS build na macOS-u. Release korak radi isključivo nakon uspjeha sva tri posla na `main` te stvara `v0.0.1` kao **pre-release**. iOS ZIP nije instalacijski IPA i ne može se objaviti u App Storeu bez Apple certifikata/provisioning profila.
+## Integritet podataka
 
-## Politika kvalitete
+Ne uključivati izvore bez provjerenih uvjeta, ne prikazivati lažne GPS položaje ili procjene i
+ne spremati ključeve u repozitorij. Testirati dozvole, offline rad, bateriju, svijetlu i tamnu temu.
 
-- Nema lažnih polazaka, kašnjenja niti GPS položaja.
-- Nema tokena, lozinki ni signing ključeva u repozitoriju.
-- Novi vanjski API mora biti HTTPS i pravno dopušten.
-- Ne označavati izdanje kao stabilno dok nije testirano na fizičkim Android/iOS uređajima.
-- Izgled i funkcionalnost uvijek treba provjeriti za svijetlu i tamnu temu.
+## Ograničenja
 
-## Versioning
-
-Prvo izdanje `v0.0.1` namijenjeno je razvoju i demonstraciji sučelja. Sljedeće verzije trebaju slijediti stvarni opseg implementiranih promjena.
+Za GTFS-RT procjene dolaska potreban je službeni GTFS Static katalog i pouzdano mapiranje ID-jeva.
+Nijedan produkcijski live feed još nije aktiviran.

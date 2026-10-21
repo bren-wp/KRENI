@@ -27,6 +27,6 @@ Podatke koristiti isključivo u skladu s licencijom i dostupnošću. Navedena ja
 
 ## Kartografska podloga
 
-Apple MapKit koristi se na iOS-u. Za Android je MapLibre renderer. Standardni poslužitelji `tile.openstreetmap.org` nisu namijenjeni neograničenom produkcijskom prometu, imaju best-effort kapacitet i zabranjuju offline preuzimanje područja. Potrebno je konfigurirati pružatelja pločica uz dopuštenje i dovoljno kapaciteta. Uvjeti: https://operations.osmfoundation.org/policies/tiles/
+Na Androidu se koristi MapLibre renderer. Standardni poslužitelji `tile.openstreetmap.org` nisu namijenjeni neograničenom produkcijskom prometu, imaju best-effort kapacitet i zabranjuju offline preuzimanje područja. Potrebno je konfigurirati pružatelja pločica uz dopuštenje i dovoljno kapaciteta. Uvjeti: https://operations.osmfoundation.org/policies/tiles/
 
 Nije dopušteno masovno preuzimati pločice ni glumiti identitet drugog klijenta.

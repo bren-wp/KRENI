@@ -37,6 +37,14 @@ class LiveSourceSecurity(unittest.TestCase):
         ]}
         validate(cfg, {"zagreb"})
 
+    def test_invalid_format_rejected(self):
+        cfg = {'schemaVersion': 1, 'refreshSeconds': 30, 'providers': [
+            {'id': 'zet', 'city': 'zagreb', 'enabled': False,
+             'approvedForProduction': False, 'endpoint': None, 'format': 'bad'}
+        ]}
+        with self.assertRaises(ValueError):
+            validate(cfg, {'zagreb'})
+
     def test_duplicate_or_unknown_city_rejected(self):
         source = {"id":"zet","city":"zagreb","enabled":False,
                   "approvedForProduction":False,"endpoint":None}

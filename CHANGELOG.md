@@ -1,5 +1,12 @@
 # Promjene
 
+## v0.0.6 — 2026-10-21
+- Android-only, potpuno uklonjen iOS iz koda, CI-a i dokumentacije.
+- Stvarni GTFS-Realtime protobuf parser za GPS položaje i kontrolu svježine.
+- Popis GPS vozila, izbor vozila i centriranje karte; status bez dostupnog izvora.
+- Pauziranje mrežnog pollinga izvan prvog plana i novi testovi.
+- Testni ZET feed ostaje isključen dok nema produkcijske verifikacije.
+
 ## v0.0.5 — 2026-10-10
 - Odvojeno desetsekundno osvježavanje prikaza na Androidu i iOS-u, neovisno o mrežnom pollingu.
 - Uklanjanje isteklih GPS položaja i procjena dolaska nakon 90 sekundi.

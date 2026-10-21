@@ -5,9 +5,6 @@
 .DS_Store
 **/build/
 **/.gradle/
-*.xcworkspace/xcuserdata/
-ios/KRENI.xcodeproj/
-ios/KRENI/Assets.xcassets/AppIcon.appiconset/AppIcon.png
 # Credentials and signing materials
 .env
 .env.*
@@ -15,7 +12,5 @@ ios/KRENI/Assets.xcassets/AppIcon.appiconset/AppIcon.png
 *.jks
 *.keystore
 *.p12
-*.mobileprovision
-*.p8
 # Bundles
 dist/
