@@ -31,8 +31,8 @@ android {
         applicationId = "hr.brendigo.kreni"
         minSdk = 26
         targetSdk = 35
-        versionCode = 5
-        versionName = "0.0.5"
+        versionCode = 6
+        versionName = "0.0.6"
     }
 
     buildFeatures { compose = true }
@@ -66,6 +66,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.11.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.4")
     implementation("org.maplibre.gl:android-sdk:11.8.0")
+    implementation("org.mobilitydata:gtfs-realtime-bindings:0.0.8")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20250517")
 }

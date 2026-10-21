@@ -8,7 +8,8 @@
       "enabled": false,
       "endpoint": null,
       "approvedForProduction": false,
-      "licenseUrl": null
+      "licenseUrl": null,
+      "format": "gtfsrt"
     },
     {
       "id": "autotrolej",

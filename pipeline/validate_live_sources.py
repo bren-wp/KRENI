@@ -55,6 +55,8 @@ def validate(config: dict, cities: set[str]) -> None:
             raise ValueError("Enabled must be boolean")
         if not isinstance(source.get("approvedForProduction"), bool):
             raise ValueError("Missing explicit production approval")
+        if source.get("format", "json") not in ("json", "gtfsrt"):
+            raise ValueError("Unsupported source format")
         if source["enabled"]:
             if not source["approvedForProduction"]:
                 raise ValueError("A non-production provider cannot be enabled")

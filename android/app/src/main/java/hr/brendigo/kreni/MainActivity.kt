@@ -28,6 +28,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.currentStateAsState
+import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.MapLibre
 import org.maplibre.android.annotations.MarkerOptions
 import org.maplibre.android.camera.CameraPosition
@@ -44,14 +46,16 @@ private fun symbol(mode: String) = when (mode) {
     "tram" -> Icons.Default.Tram
     "train" -> Icons.Default.Train
     "ferry" -> Icons.Default.DirectionsBoat
-    else -> Icons.Default.Sailing
+    "catamaran" -> Icons.Default.Sailing
+    else -> Icons.Default.DirectionsBus
 }
 private fun modeName(mode: String) = when (mode) {
     "bus" -> "Autobusi"
     "tram" -> "Tramvaji"
     "train" -> "Vlakovi"
     "ferry" -> "Trajekti"
-    else -> "Katamarani"
+    "catamaran" -> "Katamarani"
+    else -> "Vozila"
 }
 
 class MainActivity : ComponentActivity() {
@@ -66,14 +70,19 @@ class MainActivity : ComponentActivity() {
             var chosenStop by remember { mutableStateOf<Stop?>(null) }
             var live by remember { mutableStateOf(emptyList<LiveData>()) }
             var clock by remember { mutableLongStateOf(Instant.now().epochSecond) }
-            LaunchedEffect(Unit) {
+            val lifecycleOwner = LocalLifecycleOwner.current
+            val lifecycleState by lifecycleOwner.lifecycle.currentStateAsState()
+            val isStarted = lifecycleState.isAtLeast(Lifecycle.State.STARTED)
+            LaunchedEffect(isStarted) {
+                if (!isStarted) return@LaunchedEffect
                 while (true) {
                     delay(10_000)
                     clock = Instant.now().epochSecond
                 }
             }
-            LaunchedEffect(prefs.city) {
+            LaunchedEffect(prefs.city, isStarted) {
                 live = emptyList()
+                if (!isStarted || liveNetwork.activeCount(prefs.city) == 0) return@LaunchedEffect
                 val requestedCity = prefs.city
                 while (true) {
                     live = liveNetwork.refresh(requestedCity)
@@ -81,6 +90,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
             val city = catalog.cities.firstOrNull { it.id == prefs.city } ?: catalog.cities.first()
+            val activeProviders = liveNetwork.activeCount(city.id)
             val currentLive = live.filter { it.freshFor(city.id, clock) }
                 .map { it.filtered(clock) }
             val surface = if (prefs.dark) Navy else Color(0xFFF4F7FC)
@@ -155,11 +165,12 @@ class MainActivity : ComponentActivity() {
                                 prefs.favorites,
                                 currentLive,
                                 clock,
+                                activeProviders,
                                 onFavorite = { id ->
                                     apply(prefs.copy(favorites =
                                         if (id in prefs.favorites) prefs.favorites - id else prefs.favorites + id))
                                 })
-                            2 -> DeparturesTab(city, catalog.stopsIn(city.id), currentLive, clock)
+                            2 -> DeparturesTab(city, catalog.stopsIn(city.id), currentLive, clock, activeProviders)
                             else -> MoreTab(
                                 prefs, catalog.stops.filter { it.id in prefs.favorites },
                                 onDark = { apply(prefs.copy(dark = it)) },
@@ -300,10 +311,12 @@ private fun StopCard(stop: Stop, favorite: Boolean, onFavorite: () -> Unit, onOp
 @Composable
 private fun MapTab(
     city: City, stops: List<Stop>, focus: Stop?, favorites: Set<String>,
-    live: List<LiveData>, clock: Long, onFavorite: (String) -> Unit
+    live: List<LiveData>, clock: Long, activeProviders: Int,
+    onFavorite: (String) -> Unit
 ) {
     var filter by remember(city.id) { mutableStateOf("all") }
     var selected by remember(city.id, focus?.id) { mutableStateOf(focus) }
+    var selectedVehicle by remember(city.id) { mutableStateOf<Vehicle?>(null) }
     val visible = stops.filter { filter == "all" || filter in it.modes }
     val vehicles = live.flatMap { it.vehicles }.filter { filter == "all" || it.mode == filter }
     Column(Modifier.fillMaxSize()) {
@@ -319,14 +332,15 @@ private fun MapTab(
             }
         }
         val updated = live.maxOfOrNull { it.generatedAt }
-        Text(if (vehicles.isEmpty()) "Praćenje vozila trenutačno nije dostupno"
-             else "GPS vozila: " + vehicles.size +
+        Text(if (activeProviders == 0) "LIVE nije dostupan: nema odobrenog izvora za " + city.name
+             else if (vehicles.isEmpty()) "Izvori: " + activeProviders + " · nema svježih GPS položaja"
+             else "UŽIVO · GPS vozila: " + vehicles.size +
                  " · osvježeno prije " + (clock - (updated ?: clock)).coerceAtLeast(0) + " s",
              modifier = Modifier.padding(horizontal = 16.dp, vertical = 7.dp),
              style = MaterialTheme.typography.bodySmall)
         Box(Modifier.weight(1f)) {
-            key(city.id, filter, focus?.id) {
-                MapLibreContent(city, visible, vehicles, focus, Modifier.fillMaxSize())
+            key(city.id, focus?.id) {
+                MapLibreContent(city, visible, vehicles, focus, selectedVehicle, Modifier.fillMaxSize())
             }
             Surface(
                 modifier = Modifier.align(Alignment.TopCenter).padding(12.dp),
@@ -342,9 +356,24 @@ private fun MapTab(
             val stop = selected!!
             StopCard(stop, stop.id in favorites, { onFavorite(stop.id) }) { selected = null }
         }
-        LazyColumn(modifier = Modifier.heightIn(max = 185.dp),
+        LazyColumn(modifier = Modifier.heightIn(max = 220.dp),
             contentPadding = PaddingValues(8.dp)) {
-            items(visible, key = { it.id }) { stop ->
+            if (vehicles.isNotEmpty()) item {
+                Text("Vozila s potvrđenim GPS položajem",
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.titleSmall)
+            }
+            items(vehicles.sortedWith(compareBy({ it.mode }, { it.route })),
+                key = { "vehicle:" + it.provider + ":" + it.id }) { vehicle ->
+                ListItem(
+                    leadingContent = { Icon(symbol(vehicle.mode), null, tint = Electric) },
+                    headlineContent = { Text(modeName(vehicle.mode) + " · " + vehicle.route) },
+                    supportingContent = { Text(vehicle.provider + " · GPS prije " +
+                        (clock - vehicle.observedAt).coerceAtLeast(0) + " s") },
+                    modifier = Modifier.clickable { selectedVehicle = vehicle }
+                )
+            }
+            items(visible, key = { "stop:" + it.id }) { stop ->
                 ListItem(
                     headlineContent = { Text(stop.name) },
                     supportingContent = { Text(stop.modes.joinToString { modeName(it) }) },
@@ -356,7 +385,7 @@ private fun MapTab(
 
 @Composable
 private fun MapLibreContent(city: City, stops: List<Stop>, vehicles: List<Vehicle>,
-    focus: Stop?, modifier: Modifier) {
+    focus: Stop?, selectedVehicle: Vehicle?, modifier: Modifier) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val view = remember(city.id, focus?.id) {
@@ -412,12 +441,19 @@ private fun MapLibreContent(city: City, stops: List<Stop>, vehicles: List<Vehicl
             }
         }
     }
+    LaunchedEffect(view, selectedVehicle?.id, selectedVehicle?.observedAt) {
+        val vehicle = selectedVehicle ?: return@LaunchedEffect
+        view.getMapAsync { map ->
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                LatLng(vehicle.lat, vehicle.lon), 15.0))
+        }
+    }
     AndroidView(factory = { view }, modifier = modifier)
 }
 
 @Composable
 private fun DeparturesTab(city: City, stops: List<Stop>, live: List<LiveData>,
-    now: Long) {
+    now: Long, activeProviders: Int) {
     val arrivals = live.flatMap { it.arrivals }.filter { arrival ->
         stops.any { it.id == arrival.stopId } && arrival.minutes(now) != null
     }.sortedBy { it.predictedAt ?: it.scheduledAt ?: Long.MAX_VALUE }
@@ -435,7 +471,9 @@ private fun DeparturesTab(city: City, stops: List<Stop>, live: List<LiveData>,
                         modifier = Modifier.size(38.dp))
                     Spacer(Modifier.width(12.dp))
                     Column {
-                        Text("Nema potvrđenih dolazaka", fontWeight = FontWeight.SemiBold)
+                        Text(if (activeProviders == 0) "Nema odobrenog live izvora"
+                             else "Nema svježih potvrđenih dolazaka",
+                             fontWeight = FontWeight.SemiBold)
                         Text("Prije putovanja provjeri službeni vozni red.",
                             style = MaterialTheme.typography.bodySmall)
                     }

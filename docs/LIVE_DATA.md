@@ -22,7 +22,7 @@ Stateless HTTPS adapter od odobrenog GTFS-Realtime feeda mora proizvesti JSON sa
 
 Svako ETA polje mora predstavljati podatak dobiven od izvora, a nikad procjenu iz udaljenosti između GPS koordinata. stopId mora odgovarati službenom mapiranom GTFS identifikatoru stajališta.
 
-Aplikacije osvježavaju podatke svakih 30 sekundi, odbacuju položaje i procjene starije od 90 sekundi, prihvaćaju samo HTTPS i ograničavaju odgovor na 512 KiB. Ne pohranjuju GPS podatke u bazu. Dok izvori iz data/live_sources.json nemaju potvrđenu produkcijsku dozvolu i ispravan endpoint, ostaju isključeni.
+Android aplikacija osvježavaju podatke svakih 30 sekundi, odbacuju položaje i procjene starije od 90 sekundi, prihvaćaju samo HTTPS i ograničavaju odgovor na 512 KiB. Ne pohranjuju GPS podatke u bazu. Dok izvori iz data/live_sources.json nemaju potvrđenu produkcijsku dozvolu i ispravan endpoint, ostaju isključeni.
 
 ## Sigurnost
 
@@ -32,8 +32,12 @@ Preporuka za svježinu podataka: https://github.com/google/transit/blob/master/g
 
 ## Kontrola produkcijskih izvora (v0.0.5)
 
-Konfiguracija `data/live_sources.json` mora sadržavati zasebne oznake `enabled`, `approvedForProduction`, `licenseUrl` i `endpoint`. Aplikacije neće uspostaviti mrežnu vezu s izvorom bez izričite aktivacije, potvrde produkcijske dozvole, javne HTTPS poveznice na uvjete korištenja i HTTPS adrese feeda. Sama oznaka nije pravna provjera: potrebna je neovisna potvrda s prijevoznikom.
+Konfiguracija `data/live_sources.json` mora sadržavati zasebne oznake `enabled`, `approvedForProduction`, `licenseUrl` i `endpoint`. Android aplikacija neće uspostaviti mrežnu vezu s izvorom bez izričite aktivacije, potvrde produkcijske dozvole, javne HTTPS poveznice na uvjete korištenja i HTTPS adrese feeda. Sama oznaka nije pravna provjera: potrebna je neovisna potvrda s prijevoznikom.
 
 Polasci i GPS pozicije brišu se iz prikaza nakon 90 sekundi bez svježeg podatka, čak i ako mreža prestane raditi nakon posljednjeg uspješnog zahtjeva. Promjena grada ne smije prikazati podatke iz prethodnog grada. Vremenski podaci na ekranu osvježavaju se svakih 10 sekundi.
 
-CI validira konfiguraciju izvora i provodi Android JVM i iOS XCTest testove, uključujući rubne slučajeve s neispravnim vremenskim oznakama i izostalim odobrenjem za produkciju.
+CI validira konfiguraciju izvora i provodi Android JVM i GTFS-Realtime JVM testove, uključujući rubne slučajeve s neispravnim vremenskim oznakama i izostalim odobrenjem za produkciju.
+
+## Nativni GTFS-Realtime protobuf (v0.0.6)
+
+Android podržava `format: "gtfsrt"` u konfiguraciji pružatelja. Iz binarne poruke FeedMessage čita stvarne VehiclePositions i vremenske oznake; bez službenog GTFS Static mapiranja `route_type`, modalitet je neutralno „Vozila”, a TripUpdate stajališta ne pretvaraju se u ETA za orijentacijski katalog. GTFS Realtime ne uključuje se automatski, i dalje su potrebni produkcijsko odobrenje, provjeren izvor i licencija. Mrežno dohvaćanje radi samo kada je aplikacija u prvom planu.

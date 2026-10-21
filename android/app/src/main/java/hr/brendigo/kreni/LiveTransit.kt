@@ -33,7 +33,7 @@ data class LiveData(val city: String, val provider: String, val generatedAt: Lon
         arrivals = arrivals.filter { it.fresh(now) }
     )
 }
-data class LiveProvider(val id: String, val city: String, val enabled: Boolean, val endpoint: String?)
+data class LiveProvider(val id: String, val city: String, val enabled: Boolean, val endpoint: String?, val format: String = "json")
 
 object LiveCodec {
     private val modes = setOf("bus","tram","train","ferry","catamaran")
@@ -53,8 +53,10 @@ object LiveCodec {
             }
             val approved = x.optBoolean("approvedForProduction", false) &&
                 x.optString("licenseUrl").startsWith("https://")
+            val format = x.optString("format", "json")
             LiveProvider(x.getString("id"),x.getString("city"),
-                x.getBoolean("enabled") && approved && url != null,url)
+                x.getBoolean("enabled") && approved && url != null && format in setOf("json", "gtfsrt"),
+                url, format)
         }
     }
     fun parse(text: String, city: String, provider: String, now: Long): LiveData {
@@ -94,6 +96,8 @@ object LiveCodec {
 }
 
 class LiveNetwork(private val sources: List<LiveProvider>) {
+    fun activeCount(city: String): Int = sources.count { it.enabled && it.city == city }
+
     suspend fun refresh(city: String, now: Long = Instant.now().epochSecond): List<LiveData> =
         withContext(Dispatchers.IO) {
             sources.filter { it.enabled && it.city == city }.mapNotNull { source ->
@@ -105,11 +109,13 @@ class LiveNetwork(private val sources: List<LiveProvider>) {
                     try {
                         connection.instanceFollowRedirects = false
                         connection.connectTimeout = 5000; connection.readTimeout = 5000
-                        connection.setRequestProperty("Accept","application/json")
+                        connection.setRequestProperty("Accept", if (source.format == "gtfsrt") "application/x-protobuf" else "application/json")
                         require(connection.responseCode == 200)
                         val bytes = connection.inputStream.use { it.readNBytes(524289) }
                         require(bytes.size <= 524288)
-                        LiveCodec.parse(bytes.toString(Charsets.UTF_8),city,source.id,
+                        if (source.format == "gtfsrt")
+                            GtfsRealtimeCodec.parse(bytes, city, source.id, Instant.now().epochSecond)
+                        else LiveCodec.parse(bytes.toString(Charsets.UTF_8),city,source.id,
                             Instant.now().epochSecond)
                     } finally { connection.disconnect() }
                 } catch (cancelled: CancellationException) {
