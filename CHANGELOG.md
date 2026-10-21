@@ -1,5 +1,13 @@
 # Promjene
 
+## v0.0.7 — 2026-10-21
+- Nativni Kotlin/Compose redizajn pet zaslona i uvodnog zaslona prema zadanim Android UI referencama.
+- Material 3 dizajnerski sustav, navigacija s pet kartica i komponentizirane kartice, pretraga, favoriti i izbor grada.
+- Karte s odabirom vozila i stajališta, potvrđeni dolasci, planiranje bez izmišljenih ruta.
+- Uporaba lokalnih grafičkih motiva uz siguran fallback; nema stvaranja novih slika u aplikaciji.
+- Lokalno spremljena postavka prvog pokretanja; kontrole obavijesti deaktivirane bez izvora.
+- Optimizacija i nova Android APK/AAB CI konfiguracija.
+
 ## v0.0.6 — 2026-10-21
 - Android-only, potpuno uklonjen iOS iz koda, CI-a i dokumentacije.
 - Stvarni GTFS-Realtime protobuf parser za GPS položaje i kontrolu svježine.

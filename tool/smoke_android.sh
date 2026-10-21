@@ -6,7 +6,7 @@ echo "Installing package: $APK"
 test -s "$APK"
 adb install -r "$APK"
 mkdir -p dist/screenshots/android
-for item in home:0 map:1 departures:2 more:3; do
+for item in home:0 map:1 departures:2 planner:3 more:4; do
   screen="${item%%:*}"
   index="${item##*:}"
   adb shell am force-stop hr.brendigo.kreni || true

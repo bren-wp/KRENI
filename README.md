@@ -43,3 +43,9 @@ nepotpisani AAB ili produkcijski potpisani APK/AAB kada su postavljeni valjani k
 [Upute za izradu i potpisivanje](docs/BUILD.md).
 
 KRENI · Brendigo © 2026 · [MIT](LICENSE)
+
+## Premium Android sučelje (v0.0.7)
+
+Sučelje je modularizirano prema korisničkim referencama: Početna, Karta, Polasci, Planer i Više, uz uvodni zaslon. Korišten je Kotlin / Jetpack Compose s Material 3 komponentama, zadržanim MapLibre prikazom i jasnim stanjima dostupnosti podataka. Fotografski motivi korisnika učitavaju se iz lokalnih resursa `android/app/src/main/assets/brand/` ako su dostupni; pri nedostupnim fotografijama zadržan je funkcionalan gradijentni prikaz bez rušenja.
+
+**Prikazane linije, dolasci i GPS podaci nisu simulirani.** Planiranje ruta zahtijeva provjerene GTFS podatke. Obavijesti o poremećajima onemogućene su dok ne postoji pravi izvor upozorenja.
