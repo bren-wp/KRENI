@@ -172,7 +172,7 @@ fun StopListCard(
 }
 
 @Composable
-fun StatusCard(title: String, details: String, icon: androidx.compose.ui.graphics.vector.ImageVector = Icons.Default.InfoOutline) {
+fun StatusCard(title: String, details: String, icon: androidx.compose.ui.graphics.vector.ImageVector = Icons.Default.Info) {
     PremiumCard(Modifier.fillMaxWidth()) {
         Row(Modifier.padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(icon, contentDescription = null, tint = BrandBlue, modifier = Modifier.size(28.dp))

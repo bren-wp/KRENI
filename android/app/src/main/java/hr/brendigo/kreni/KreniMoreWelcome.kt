@@ -218,7 +218,7 @@ fun MoreScreen(
                 listOf(
                     Triple("Pomoć", Icons.Default.HelpOutline, "help"),
                     Triple("Privatnost", Icons.Default.Shield, "privacy"),
-                    Triple("O aplikaciji", Icons.Default.InfoOutline, "about")
+                    Triple("O aplikaciji", Icons.Default.Info, "about")
                 ).forEach { (name, icon, value) ->
                     Card(
                         onClick = { dialog = value }, modifier = Modifier.weight(1f),
