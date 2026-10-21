@@ -2,17 +2,17 @@
 
 ## Android
 
-Izvor: [Android projekt](../android/) (Kotlin / Jetpack Compose), verzija 0.0.6.
+Izvor: [Android projekt](../android/) (Kotlin / Jetpack Compose), verzija 0.0.7.
 
 Na računalu s Android SDK, JDK 17 i Gradle 8.14.3, komande: cd android; gradle :app:testDebugUnitTest :app:assembleDebug :app:assembleRelease :app:bundleRelease.
 
 | Datoteka izdanja | Svrha |
 | --- | --- |
-| KRENI-Android-v0.0.6-installable-test.apk | Digitalno potpisani APK za testiranje, automatski instaliran na Android emulator |
-| KRENI-Android-v0.0.6-release-signed.apk | Distribucijski APK, samo ako su dostupni trajni signing ključevi |
-| KRENI-Android-v0.0.6-play-signed.aab | Google Play AAB, samo kad su dostupni trajni signing ključevi |
-| KRENI-Android-v0.0.6-unsigned.aab | AAB bez distribucijskog potpisa, za naknadno potpisivanje |
-| KRENI-Android-v0.0.6-source.zip | Izvorni Android projekt i zajednički podaci |
+| KRENI-Android-v0.0.7-installable-test.apk | Digitalno potpisani APK za testiranje, automatski instaliran na Android emulator |
+| KRENI-Android-v0.0.7-release-signed.apk | Distribucijski APK, samo ako su dostupni trajni signing ključevi |
+| KRENI-Android-v0.0.7-play-signed.aab | Google Play AAB, samo kad su dostupni trajni signing ključevi |
+| KRENI-Android-v0.0.7-unsigned.aab | AAB bez distribucijskog potpisa, za naknadno potpisivanje |
+| KRENI-Android-v0.0.7-source.zip | Izvorni Android projekt i zajednički podaci |
 
 AAB se ne instalira kao obični APK. GitHub Secrets nazivi:
 - KRENI_ANDROID_KEYSTORE_BASE64 (base64 datoteka JKS)

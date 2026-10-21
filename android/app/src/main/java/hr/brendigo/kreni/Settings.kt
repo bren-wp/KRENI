@@ -9,7 +9,10 @@ import java.io.File
 data class Preferences(
     val city: String = "zagreb",
     val dark: Boolean = false,
-    val favorites: Set<String> = emptySet()
+    val favorites: Set<String> = emptySet(),
+    val welcomeSeen: Boolean = false,
+    val alertPreferences: Boolean = false,
+    val favoriteNotifications: Boolean = false
 )
 
 class Settings(private val context: Context, private val catalog: Catalog) {
@@ -23,7 +26,9 @@ class Settings(private val context: Context, private val catalog: Catalog) {
         val arr = root.optJSONArray("favorites") ?: JSONArray()
         val known = catalog.stops.map { it.id }.toSet()
         Preferences(city, root.optBoolean("dark", false),
-            (0 until arr.length()).mapNotNull { arr.optString(it) }.filter { it in known }.toSet())
+            (0 until arr.length()).mapNotNull { arr.optString(it) }.filter { it in known }.toSet(),
+            root.optBoolean("welcomeSeen", false), root.optBoolean("alertPreferences", false),
+            root.optBoolean("favoriteNotifications", false))
     } catch (_: Exception) {
         Preferences()
     }
@@ -31,6 +36,9 @@ class Settings(private val context: Context, private val catalog: Catalog) {
     fun save(state: Preferences) {
         val root = JSONObject().put("schemaVersion", 1).put("city", state.city)
             .put("dark", state.dark).put("favorites", JSONArray(state.favorites.sorted()))
+            .put("welcomeSeen", state.welcomeSeen)
+            .put("alertPreferences", state.alertPreferences)
+            .put("favoriteNotifications", state.favoriteNotifications)
         var stream: java.io.FileOutputStream? = null
         try {
             stream = file.startWrite()
